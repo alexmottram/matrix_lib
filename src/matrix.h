@@ -6,6 +6,8 @@
 #include <iosfwd>
 #include <stdexcept>
 #include <vector>
+#include <list>
+#include <numeric>
 #include "utils/std_extensions.h"
 
 class Matrix {

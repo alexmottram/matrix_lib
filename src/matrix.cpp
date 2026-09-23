@@ -210,8 +210,36 @@ Matrix Matrix::lin_solve(const Matrix &b) const {
     if (size_y != b.size_y) {
         throw std::invalid_argument("Matrix and column vector must have the same number of rows");
     }
-    
 
+    // TODO Create row access operators first
+    std::list<size_t> rows_remaining(size_y);
+    std::iota(rows_remaining.begin(), rows_remaining.end(), 0);
+    std::list<size_t> rows_ordered;
+
+    for (auto i = 0; i < size_y; ++i) {
+
+        while (!rows_remaining.empty()) {
+            iteration_number++;
+
+            for (auto row_it = rows_remaining.begin(); row_it != rows_remaining.end(); ++row_it) {
+
+                // If row has a non-zero pivot, move it to the ordered list and break to restart scanning
+                non_zero_pivot = at()
+
+
+                if (matches(*row_it)) {
+                    rows_ordered.splice(rows_ordered.end(), rows_remaining, it);
+
+                    break; // restart scanning from rows_remaining.begin()
+                }
+            }
+        }
+    }
+
+
+
+
+    return b;
 }
 
 
