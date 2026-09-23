@@ -1,0 +1,268 @@
+#include "matrix.h"
+
+#include <iomanip>
+#include <sstream>
+
+Matrix::Iterator::Iterator(Matrix* matrix, const size_t index) : matrix(matrix), index(index) {
+}
+
+Matrix::Iterator::reference Matrix::Iterator::operator*() const {
+    return ElementReference{
+        matrix->index_to_x(index),
+        matrix->index_to_y(index),
+        matrix->data.at(index)
+    };
+}
+
+Matrix::Iterator& Matrix::Iterator::operator++() {
+    ++index;
+    return *this;
+}
+
+Matrix::Iterator Matrix::Iterator::operator++(int) {
+    Iterator copy(*this);
+    ++(*this);
+    return copy;
+}
+
+bool Matrix::Iterator::operator==(const Iterator& other) const {
+    return matrix == other.matrix && index == other.index;
+}
+
+bool Matrix::Iterator::operator!=(const Iterator& other) const {
+    return !(*this == other);
+}
+
+Matrix::ConstIterator::ConstIterator(const Matrix* matrix, const size_t index) : matrix(matrix), index(index) {
+}
+
+Matrix::ConstIterator::reference Matrix::ConstIterator::operator*() const {
+    return ConstElementReference{
+        matrix->index_to_x(index),
+        matrix->index_to_y(index),
+        matrix->data.at(index)
+    };
+}
+
+Matrix::ConstIterator& Matrix::ConstIterator::operator++() {
+    ++index;
+    return *this;
+}
+
+Matrix::ConstIterator Matrix::ConstIterator::operator++(int) {
+    ConstIterator copy(*this);
+    ++(*this);
+    return copy;
+}
+
+bool Matrix::ConstIterator::operator==(const ConstIterator& other) const {
+    return matrix == other.matrix && index == other.index;
+}
+
+bool Matrix::ConstIterator::operator!=(const ConstIterator& other) const {
+    return !(*this == other);
+}
+
+Matrix::Matrix(const size_t size_x, const size_t size_y) {
+    this->size_x = size_x;
+    this->size_y = size_y;
+    this->data = std::vector<double>(size_x * size_y, 0.0);
+}
+
+Matrix::Matrix(const std::initializer_list<std::initializer_list<double>> values) {
+    size_y = values.size();
+    size_x = 0;
+
+    if (size_y > 0) {
+        size_x = values.begin()->size();
+    }
+
+    data.reserve(size_x * size_y);
+
+    for (const auto& row : values) {
+        if (row.size() != size_x) {
+            throw std::invalid_argument("matrix rows must all have the same length");
+        }
+
+        data.insert(data.end(), row.begin(), row.end());
+    }
+}
+
+double& Matrix::at(const size_t x, const size_t y) {
+    return data.at(coord_to_index(x, y));
+}
+
+const double& Matrix::at(const size_t x, const size_t y) const {
+    return data.at(coord_to_index(x, y));
+}
+
+bool Matrix::operator==(const Matrix &matrix) const {
+    if (size_x != matrix.size_x || size_y != matrix.size_y) {
+        return false;
+    }
+
+    for (const auto element : *this) {
+        if (element.value != matrix.at(element.x, element.y)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+Matrix::Iterator Matrix::begin() {
+    return Iterator(this, 0);
+}
+
+Matrix::Iterator Matrix::end() {
+    return Iterator(this, data.size());
+}
+
+Matrix::ConstIterator Matrix::begin() const {
+    return ConstIterator(this, 0);
+}
+
+Matrix::ConstIterator Matrix::end() const {
+    return ConstIterator(this, data.size());
+}
+
+Matrix Matrix::operator+(const Matrix &matrix) const {
+    if (size_x != matrix.size_x || size_y != matrix.size_y) {
+        throw std::invalid_argument("Matrix dimensions must match for addition");
+    }
+
+    Matrix result(size_x, size_y);
+
+    for (const auto [x, y, value] : *this) {
+        result.at(x, y) = value + matrix.at(x, y);
+    }
+
+    return result;
+}
+
+Matrix Matrix::operator-(const Matrix &matrix) const {
+    if (size_x != matrix.size_x || size_y != matrix.size_y) {
+        throw std::invalid_argument("Matrix dimensions must match for subtraction");
+    }
+
+    Matrix result(size_x, size_y);
+
+    for (const auto [x, y, value] : *this) {
+        result.at(x, y) = value - matrix.at(x, y);
+    }
+
+    return result;
+}
+
+Matrix Matrix::operator*(const Matrix &matrix) const {
+    if (size_x != matrix.size_y) {
+        throw std::invalid_argument("Matrix dimensions must match for multiplication");
+    }
+
+    Matrix result(matrix.size_x, size_y);
+
+    for (size_t y = 0; y < size_y; ++y) {
+        for (size_t x = 0; x < matrix.size_x; ++x) {
+            double sum = 0.0;
+            for (size_t k = 0; k < size_x; ++k) {
+                sum += at(k, y) * matrix.at(x, k);
+            }
+            result.at(x, y) = sum;
+        }
+    }
+
+    return result;
+}
+
+Matrix Matrix::operator*(const double scalar) const {
+    Matrix result(size_x, size_y);
+
+    for (const auto [x, y, value] : *this) {
+        result.at(x, y) = value * scalar;
+    }
+
+    return result;
+}
+
+Matrix Matrix::transpose() const {
+    Matrix result(size_y, size_x);
+
+    for (const auto [x, y, value] : *this) {
+        result.at(y, x) = value;
+    }
+
+    return result;
+}
+
+Matrix Matrix::lin_solve(const Matrix &b) const {
+
+    // Throw error if b is not a column vector
+    if (b.size_x != 1) {
+        throw std::invalid_argument("Matrix b must be a column vector");
+    }
+
+    // Throw error if matrix is not square
+    if (size_x != size_y) {
+        throw std::invalid_argument("Matrix must be square");
+    }
+
+    // Throw error if column length doesn't match
+    if (size_y != b.size_y) {
+        throw std::invalid_argument("Matrix and column vector must have the same number of rows");
+    }
+    
+
+}
+
+
+size_t Matrix::coord_to_index(const size_t x, const size_t y) const {
+    if (x >= size_x || y >= size_y) {
+        throw std::out_of_range("Matrix coordinates out of range");
+    }
+
+    return y * size_x + x;
+}
+
+size_t Matrix::index_to_x(const size_t index) const {
+    return index % size_x;
+}
+
+size_t Matrix::index_to_y(const size_t index) const {
+    return index / size_x;
+}
+
+std::ostream& operator<<(std::ostream& os, const Matrix& a) {
+    std::vector<size_t> column_widths(a.size_x, 0);
+
+    for (size_t col = 0; col < a.size_x; ++col) {
+        for (size_t row = 0; row < a.size_y; ++row) {
+            std::ostringstream cell_stream;
+            cell_stream << a.at(col, row);
+            const size_t cell_width = cell_stream.str().size();
+            if (cell_width > column_widths.at(col)) {
+                column_widths.at(col) = cell_width;
+            }
+        }
+    }
+
+    for (size_t row = 0; row < a.size_y; ++row) {
+        os << "[";
+        for (size_t col = 0; col < a.size_x; ++col) {
+            if (col > 0) {
+                os << ", ";
+            }
+            os << std::setw(static_cast<int>(column_widths.at(col)))
+               << a.at(col, row);
+        }
+        os << "]";
+        if (row + 1 < a.size_y) {
+            os << '\n';
+        }
+    }
+
+    return os;
+}
+
+Matrix operator*(const double scalar, const Matrix &matrix) {
+    return matrix * scalar;
+}
