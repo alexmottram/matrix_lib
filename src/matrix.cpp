@@ -3,66 +3,6 @@
 #include <iomanip>
 #include <sstream>
 
-Matrix::Iterator::Iterator(Matrix* matrix, const size_t index) : matrix(matrix), index(index) {
-}
-
-Matrix::Iterator::reference Matrix::Iterator::operator*() const {
-    return ElementReference{
-        matrix->index_to_x(index),
-        matrix->index_to_y(index),
-        matrix->data.at(index)
-    };
-}
-
-Matrix::Iterator& Matrix::Iterator::operator++() {
-    ++index;
-    return *this;
-}
-
-Matrix::Iterator Matrix::Iterator::operator++(int) {
-    Iterator copy(*this);
-    ++(*this);
-    return copy;
-}
-
-bool Matrix::Iterator::operator==(const Iterator& other) const {
-    return matrix == other.matrix && index == other.index;
-}
-
-bool Matrix::Iterator::operator!=(const Iterator& other) const {
-    return !(*this == other);
-}
-
-Matrix::ConstIterator::ConstIterator(const Matrix* matrix, const size_t index) : matrix(matrix), index(index) {
-}
-
-Matrix::ConstIterator::reference Matrix::ConstIterator::operator*() const {
-    return ConstElementReference{
-        matrix->index_to_x(index),
-        matrix->index_to_y(index),
-        matrix->data.at(index)
-    };
-}
-
-Matrix::ConstIterator& Matrix::ConstIterator::operator++() {
-    ++index;
-    return *this;
-}
-
-Matrix::ConstIterator Matrix::ConstIterator::operator++(int) {
-    ConstIterator copy(*this);
-    ++(*this);
-    return copy;
-}
-
-bool Matrix::ConstIterator::operator==(const ConstIterator& other) const {
-    return matrix == other.matrix && index == other.index;
-}
-
-bool Matrix::ConstIterator::operator!=(const ConstIterator& other) const {
-    return !(*this == other);
-}
-
 Matrix::Matrix(const size_t size_x, const size_t size_y) {
     this->size_x = size_x;
     this->size_y = size_y;
@@ -94,6 +34,38 @@ double& Matrix::at(const size_t x, const size_t y) {
 
 const double& Matrix::at(const size_t x, const size_t y) const {
     return data.at(coord_to_index(x, y));
+}
+
+Matrix::RowView Matrix::row_at(const size_t y) {
+    if (y >= size_y) {
+        throw std::out_of_range("Matrix row index out of range");
+    }
+
+    return RowView(this, y);
+}
+
+Matrix::ConstRowView Matrix::row_at(const size_t y) const {
+    if (y >= size_y) {
+        throw std::out_of_range("Matrix row index out of range");
+    }
+
+    return ConstRowView(this, y);
+}
+
+Matrix::ColumnView Matrix::column_at(const size_t x) {
+    if (x >= size_x) {
+        throw std::out_of_range("Matrix column index out of range");
+    }
+
+    return ColumnView(this, x);
+}
+
+Matrix::ConstColumnView Matrix::column_at(const size_t x) const {
+    if (x >= size_x) {
+        throw std::out_of_range("Matrix column index out of range");
+    }
+
+    return ConstColumnView(this, x);
 }
 
 bool Matrix::operator==(const Matrix &matrix) const {
@@ -194,6 +166,7 @@ Matrix Matrix::transpose() const {
     return result;
 }
 
+// TODO complete this
 Matrix Matrix::lin_solve(const Matrix &b) const {
 
     // Throw error if b is not a column vector
@@ -216,28 +189,25 @@ Matrix Matrix::lin_solve(const Matrix &b) const {
     std::iota(rows_remaining.begin(), rows_remaining.end(), 0);
     std::list<size_t> rows_ordered;
 
-    for (auto i = 0; i < size_y; ++i) {
-
-        while (!rows_remaining.empty()) {
-            iteration_number++;
-
-            for (auto row_it = rows_remaining.begin(); row_it != rows_remaining.end(); ++row_it) {
-
-                // If row has a non-zero pivot, move it to the ordered list and break to restart scanning
-                non_zero_pivot = at()
-
-
-                if (matches(*row_it)) {
-                    rows_ordered.splice(rows_ordered.end(), rows_remaining, it);
-
-                    break; // restart scanning from rows_remaining.begin()
-                }
-            }
-        }
-    }
-
-
-
+    // for (auto i = 0; i < size_y; ++i) {
+    //
+    //     while (!rows_remaining.empty()) {
+    //         iteration_number++;
+    //
+    //         for (auto row_it = rows_remaining.begin(); row_it != rows_remaining.end(); ++row_it) {
+    //
+    //             // If row has a non-zero pivot, move it to the ordered list and break to restart scanning
+    //             non_zero_pivot = at()
+    //
+    //
+    //             if (matches(*row_it)) {
+    //                 rows_ordered.splice(rows_ordered.end(), rows_remaining, it);
+    //
+    //                 break; // restart scanning from rows_remaining.begin()
+    //             }
+    //         }
+    //     }
+    // }
 
     return b;
 }

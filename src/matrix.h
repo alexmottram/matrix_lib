@@ -24,50 +24,35 @@ public:
         const double& value;
     };
 
-    class Iterator {
-    public:
-        using iterator_category = std::forward_iterator_tag;
-        using value_type = ElementReference;
-        using difference_type = std::ptrdiff_t;
-        using reference = ElementReference;
+    // Iterators and row/column views are declared here but defined out of
+    // line in matrix_iterator.h, matrix_row_column_iterator.h and
+    // matrix_row_column_view.h (included below) to keep this file focused
+    // on the Matrix API. They remain true nested members of Matrix, so they
+    // retain access to its private data.
+    class Iterator;
+    class ConstIterator;
+    class RowIterator;
+    class ConstRowIterator;
+    class ColumnIterator;
+    class ConstColumnIterator;
+    class RowView;
+    class ConstRowView;
+    class ColumnView;
+    class ConstColumnView;
 
-        Iterator(Matrix* matrix, size_t index);
-
-        reference operator*() const;
-        Iterator& operator++();
-        Iterator operator++(int);
-        bool operator==(const Iterator& other) const;
-        bool operator!=(const Iterator& other) const;
-
-    private:
-        Matrix* matrix;
-        size_t index;
-    };
-
-    class ConstIterator {
-    public:
-        using iterator_category = std::forward_iterator_tag;
-        using value_type = ConstElementReference;
-        using difference_type = std::ptrdiff_t;
-        using reference = ConstElementReference;
-
-        ConstIterator(const Matrix* matrix, size_t index);
-
-        [[nodiscard]] reference operator*() const;
-        ConstIterator& operator++();
-        ConstIterator operator++(int);
-        [[nodiscard]] bool operator==(const ConstIterator& other) const;
-        [[nodiscard]] bool operator!=(const ConstIterator& other) const;
-
-    private:
-        const Matrix* matrix;
-        size_t index;
-    };
-
+    // Constructors
     explicit Matrix(size_t size_x, size_t size_y);
     Matrix(std::initializer_list<std::initializer_list<double>> values);
+
+    // Accessors
     double& at(size_t x, size_t y);
     [[nodiscard]] const double& at(size_t x, size_t y) const;
+    [[nodiscard]] RowView row_at(size_t y);
+    [[nodiscard]] ConstRowView row_at(size_t y) const;
+    [[nodiscard]] ColumnView column_at(size_t x);
+    [[nodiscard]] ConstColumnView column_at(size_t x) const;
+
+    // Output
     friend std::ostream& operator<<(std::ostream& os, const Matrix& a);
 
     // Comparison
@@ -84,7 +69,7 @@ public:
     [[nodiscard]] Matrix operator-(const Matrix & matrix) const;
     [[nodiscard]] Matrix operator*(const Matrix & matrix) const;
     [[nodiscard]] Matrix operator*(double scalar) const;
-    friend [[nodiscard]] Matrix operator*(double scalar, const Matrix& matrix);
+    friend Matrix operator*(double scalar, const Matrix& matrix);
 
     // Matrix operations
     [[nodiscard]] Matrix transpose() const;
@@ -101,3 +86,8 @@ private:
     [[nodiscard]] size_t index_to_x(size_t index) const;
     [[nodiscard]] size_t index_to_y(size_t index) const;
 };
+
+#include "matrix_iterator.h"
+#include "matrix_row_column_iterator.h"
+#include "matrix_row_column_view.h"
+

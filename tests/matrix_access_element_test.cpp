@@ -4,7 +4,7 @@
 
 #include "../src/matrix.h"
 
-TEST(MatrixAccess, AllowsUpdatingAnElement) {
+TEST(MatrixAccessElements, AllowsUpdatingAnElement) {
     Matrix matrix(2, 2);
 
     std::cout << "Before setting element (1, 1):\n" << matrix << '\n';
@@ -14,7 +14,7 @@ TEST(MatrixAccess, AllowsUpdatingAnElement) {
     EXPECT_DOUBLE_EQ(matrix.at(1, 1), 42.5);
 }
 
-TEST(MatrixAccess, ThrowsForOutOfRangeCoordinates) {
+TEST(MatrixAccessElements, ThrowsForOutOfRangeCoordinates) {
     Matrix matrix(2, 2);
 
     std::cout << "Reading coordinates outside this 2x2 matrix must throw std::out_of_range:\n"

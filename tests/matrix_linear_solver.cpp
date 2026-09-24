@@ -4,7 +4,7 @@
 
 #include "../src/matrix.h"
 
-TEST(MatrixMatrixOperations, TransposeRowVector) {
+TEST(MatrixLinearSolver, SolvesSimpleLinearSystem) {
     const Matrix A{{1, 2, 1}, {3, 8, 1}, {0, 4, 1}};
     const Matrix b{{2}, {12}, {2}};
     const Matrix expected_x{{2}, {1}, {-2}};

@@ -7,8 +7,14 @@ include(FetchContent)
 include(CTest)
 
 add_library(matrix_lib src/matrix.cpp
+        src/matrix_iterator.cpp
+        src/matrix_row_column_iterator.cpp
+        src/matrix_row_column_view.cpp
         src/utils/std_extensions.h
-        src/matrix.h)
+        src/matrix.h
+        src/matrix_iterator.h
+        src/matrix_row_column_iterator.h
+        src/matrix_row_column_view.h)
 target_include_directories(matrix_lib PUBLIC src)
 
 add_executable(matrix_example examples/main.cpp)
@@ -23,10 +29,11 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(matrix_tests
         tests/matrix_construction_test.cpp
-        tests/matrix_access_test.cpp
+        tests/matrix_access_element_test.cpp
         tests/matrix_formatting_test.cpp
         tests/matrix_comparison_test.cpp
         tests/matrix_iterator_test.cpp
+        tests/matrix_access_row_column_test.cpp
         tests/matrix_basic_arithmetic_operations.cpp
         tests/matrix_matrix_operations.cpp
         tests/matrix_linear_solver.cpp
