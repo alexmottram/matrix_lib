@@ -1,13 +1,14 @@
 #include "matrix_iterator.h"
 
-Matrix::Iterator::Iterator(Matrix* matrix, const size_t index) : matrix(matrix), index(index) {
+Matrix::Iterator::Iterator(Matrix* matrix, const size_t index) :
+    matrix(matrix), index(index) {
 }
 
 Matrix::Iterator::reference Matrix::Iterator::operator*() const {
     return ElementReference{
-        matrix->index_to_x(index),
-        matrix->index_to_y(index),
-        matrix->data.at(index)
+        .x = matrix->index_to_x(index),
+        .y = matrix->index_to_y(index),
+        .value = matrix->data.at(index)
     };
 }
 
@@ -17,7 +18,7 @@ Matrix::Iterator& Matrix::Iterator::operator++() {
 }
 
 Matrix::Iterator Matrix::Iterator::operator++(int) {
-    Iterator copy(*this);
+    const Iterator copy(*this);
     ++(*this);
     return copy;
 }
@@ -30,14 +31,15 @@ bool Matrix::Iterator::operator!=(const Iterator& other) const {
     return !(*this == other);
 }
 
-Matrix::ConstIterator::ConstIterator(const Matrix* matrix, const size_t index) : matrix(matrix), index(index) {
+Matrix::ConstIterator::ConstIterator(const Matrix* matrix, const size_t index) :
+    matrix(matrix), index(index) {
 }
 
 Matrix::ConstIterator::reference Matrix::ConstIterator::operator*() const {
     return ConstElementReference{
-        matrix->index_to_x(index),
-        matrix->index_to_y(index),
-        matrix->data.at(index)
+        .x = matrix->index_to_x(index),
+        .y = matrix->index_to_y(index),
+        .value = matrix->data.at(index)
     };
 }
 
@@ -47,7 +49,7 @@ Matrix::ConstIterator& Matrix::ConstIterator::operator++() {
 }
 
 Matrix::ConstIterator Matrix::ConstIterator::operator++(int) {
-    ConstIterator copy(*this);
+    const ConstIterator copy(*this);
     ++(*this);
     return copy;
 }

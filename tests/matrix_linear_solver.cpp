@@ -17,3 +17,12 @@ TEST(MatrixLinearSolver, SolvesSimpleLinearSystem) {
     std::cout << "Computed solution x is:\n" << computed_x << '\n';
     EXPECT_TRUE(computed_x == expected_x);
 }
+
+TEST(MatrixLinearSolver, IsChevronTrue) {
+	const Matrix A{{1, 1, 1}, {0, 1, 1}, {0, 0,1}};
+
+	std::cout << "Testing that the following matrices are all chevron matrices" << std::endl;
+
+	std::cout << "Matrix A is chevron: " << A.is_chevron() << '\n' << A << std::endl;
+	EXPECT_TRUE(A.is_chevron());
+}

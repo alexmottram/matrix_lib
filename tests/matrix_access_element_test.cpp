@@ -4,6 +4,16 @@
 
 #include "../src/matrix.h"
 
+// static_assert is a valid statement inside a TEST body, so this compile-time
+// check gets a named entry in the gtest output instead of being invisible
+// file-scope code. A violation still fails the build rather than the test run.
+TEST(MatrixAccessElements, AtExposesConstCorrectElementReferences) {
+    // A const Matrix only ever exposes read-only element access (const
+    // double&), so its elements cannot be mutated through at().
+    static_assert(std::is_same_v<decltype(std::declval<const Matrix&>().at(0, 0)), const double&>);
+    static_assert(std::is_same_v<decltype(std::declval<Matrix&>().at(0, 0)), double&>);
+}
+
 TEST(MatrixAccessElements, AllowsUpdatingAnElement) {
     Matrix matrix(2, 2);
 

@@ -28,6 +28,28 @@ Matrix::Matrix(const std::initializer_list<std::initializer_list<double>> values
     }
 }
 
+Matrix Matrix::row_vector(const std::initializer_list<double> values) {
+    Matrix result(values.size(), 1);
+
+    size_t x = 0;
+    for (const double value : values) {
+        result.at(x++, 0) = value;
+    }
+
+    return result;
+}
+
+Matrix Matrix::column_vector(const std::initializer_list<double> values) {
+    Matrix result(1, values.size());
+
+    size_t y = 0;
+    for (const double value : values) {
+        result.at(0, y++) = value;
+    }
+
+    return result;
+}
+
 double& Matrix::at(const size_t x, const size_t y) {
     return data.at(coord_to_index(x, y));
 }
@@ -73,8 +95,8 @@ bool Matrix::operator==(const Matrix &matrix) const {
         return false;
     }
 
-    for (const auto element : *this) {
-        if (element.value != matrix.at(element.x, element.y)) {
+    for (const auto [x, y, value] : *this) {
+        if (value != matrix.at(x, y)) {
             return false;
         }
     }
@@ -83,21 +105,36 @@ bool Matrix::operator==(const Matrix &matrix) const {
 }
 
 Matrix::Iterator Matrix::begin() {
-    return Iterator(this, 0);
+    return {this, 0};
 }
 
 Matrix::Iterator Matrix::end() {
-    return Iterator(this, data.size());
+    return {this, data.size()};
 }
 
 Matrix::ConstIterator Matrix::begin() const {
-    return ConstIterator(this, 0);
+    return {this, 0};
 }
 
 Matrix::ConstIterator Matrix::end() const {
     return ConstIterator(this, data.size());
 }
 
+Matrix::RowIteratorConstructor Matrix::row_iterator() {
+    return RowIteratorConstructor(this);
+}
+
+Matrix::ConstRowIteratorConstructor Matrix::row_iterator() const {
+    return ConstRowIteratorConstructor(this);
+}
+
+Matrix::ColumnIteratorConstructor Matrix::column_iterator() {
+    return ColumnIteratorConstructor(this);
+}
+
+Matrix::ConstColumnIteratorConstructor Matrix::column_iterator() const {
+    return ConstColumnIteratorConstructor(this);
+}
 Matrix Matrix::operator+(const Matrix &matrix) const {
     if (size_x != matrix.size_x || size_y != matrix.size_y) {
         throw std::invalid_argument("Matrix dimensions must match for addition");
@@ -212,6 +249,16 @@ Matrix Matrix::lin_solve(const Matrix &b) const {
     return b;
 }
 
+bool Matrix::is_chevron() const {
+    return false;
+}
+
+Matrix Matrix::adjusted_matrix() const {
+    // Attempts to create an adjusted chevron matrix where each row
+    // contains more zero elements than the previous.
+    return *this;
+}
+
 
 size_t Matrix::coord_to_index(const size_t x, const size_t y) const {
     if (x >= size_x || y >= size_y) {
@@ -236,8 +283,10 @@ std::ostream& operator<<(std::ostream& os, const Matrix& a) {
         for (size_t row = 0; row < a.size_y; ++row) {
             std::ostringstream cell_stream;
             cell_stream << a.at(col, row);
-            const size_t cell_width = cell_stream.str().size();
-            if (cell_width > column_widths.at(col)) {
+            if (
+                const size_t cell_width = cell_stream.str().size();
+                cell_width > column_widths.at(col)
+                ) {
                 column_widths.at(col) = cell_width;
             }
         }

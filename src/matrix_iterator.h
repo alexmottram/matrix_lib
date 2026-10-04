@@ -2,6 +2,8 @@
 
 #include "matrix.h"
 
+#include <type_traits>
+
 // Forward-iterates over every element of a mutable Matrix in row-major
 // order, exposing each element's coordinates alongside a mutable reference.
 class Matrix::Iterator {

@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef MATRIX_LIB_MATRIX_H
+#define MATRIX_LIB_MATRIX_H
+
 #include <initializer_list>
 #include <iterator>
 #include <iostream>
@@ -25,24 +28,44 @@ public:
     };
 
     // Iterators and row/column views are declared here but defined out of
-    // line in matrix_iterator.h, matrix_row_column_iterator.h and
-    // matrix_row_column_view.h (included below) to keep this file focused
+    // line in matrix_iterator.h, matrix_slice_views.h and
+    // matrix_slice_iterators.h (included below) to keep this file focused
     // on the Matrix API. They remain true nested members of Matrix, so they
     // retain access to its private data.
     class Iterator;
     class ConstIterator;
-    class RowIterator;
-    class ConstRowIterator;
-    class ColumnIterator;
-    class ConstColumnIterator;
-    class RowView;
-    class ConstRowView;
-    class ColumnView;
-    class ConstColumnView;
+
+    // TODO -> Do the view iterators need to be defined before the views?
+    // RowIteratorBase<IsConst> and ColumnIteratorBase<IsConst> are templated
+    // on constness so the mutable and read-only iterators share a single
+    // implementation. RowIterator/ConstRowIterator (and the column
+    // equivalents) are aliases for the two instantiations actually used.
+    template <bool IsConst> class RowViewIteratorBase;
+    template <bool IsConst> class ColumnViewIteratorBase;
+    using RowViewIterator = RowViewIteratorBase<false>;
+    using ConstRowViewIterator = RowViewIteratorBase<true>;
+    using ColumnViewIterator = ColumnViewIteratorBase<false>;
+    using ConstColumnViewIterator = ColumnViewIteratorBase<true>;
+
+    // RowViewBase<IsConst> and ColumnViewBase<IsConst> are likewise templated
+    // on constness; RowView/ConstRowView (and the column equivalents) are
+    // aliases for the two instantiations actually used.
+    template <bool IsConst> class RowViewBase;
+    template <bool IsConst> class ColumnViewBase;
+    using RowView = RowViewBase<false>;
+    using ConstRowView = RowViewBase<true>;
+    using ColumnView = ColumnViewBase<false>;
+    using ConstColumnView = ColumnViewBase<true>;
 
     // Constructors
     explicit Matrix(size_t size_x, size_t size_y);
     Matrix(std::initializer_list<std::initializer_list<double>> values);
+
+    // Named factories for single-row / single-column matrices. Named rather
+    // than overloaded constructors because two std::initializer_list<double>
+    // constructors would be ambiguous to call.
+    [[nodiscard]] static Matrix row_vector(std::initializer_list<double> values);
+    [[nodiscard]] static Matrix column_vector(std::initializer_list<double> values);
 
     // Accessors
     double& at(size_t x, size_t y);
@@ -64,6 +87,32 @@ public:
     [[nodiscard]] ConstIterator begin() const;
     [[nodiscard]] ConstIterator end() const;
 
+    // Row/column iterators (which yield whole row/column views), their
+    // begin()/end() providers and {index, view} reference structs are
+    // templated on constness. Defined in matrix_slice_iterators.h.
+    template <bool IsConst> struct RowViewReferenceBase;
+    template <bool IsConst> class RowIteratorBase;
+    template <bool IsConst> class RowIteratorConstructorBase;
+    template <bool IsConst> struct ColumnViewReferenceBase;
+    template <bool IsConst> class ColumnIteratorBase;
+    template <bool IsConst> class ColumnIteratorConstructorBase;
+    using RowViewReference = RowViewReferenceBase<false>;
+    using ConstRowViewReference = RowViewReferenceBase<true>;
+    using RowIterator = RowIteratorBase<false>;
+    using ConstRowIterator = RowIteratorBase<true>;
+    using RowIteratorConstructor = RowIteratorConstructorBase<false>;
+    using ConstRowIteratorConstructor = RowIteratorConstructorBase<true>;
+    using ColumnViewReference = ColumnViewReferenceBase<false>;
+    using ConstColumnViewReference = ColumnViewReferenceBase<true>;
+    using ColumnIterator = ColumnIteratorBase<false>;
+    using ConstColumnIterator = ColumnIteratorBase<true>;
+    using ColumnIteratorConstructor = ColumnIteratorConstructorBase<false>;
+    using ConstColumnIteratorConstructor = ColumnIteratorConstructorBase<true>;
+    [[nodiscard]] RowIteratorConstructor row_iterator();
+    [[nodiscard]] ConstRowIteratorConstructor row_iterator() const;
+    [[nodiscard]] ColumnIteratorConstructor column_iterator();
+    [[nodiscard]] ConstColumnIteratorConstructor column_iterator() const;
+
     // Basic mathematical operations
     [[nodiscard]] Matrix operator+(const Matrix & matrix) const;
     [[nodiscard]] Matrix operator-(const Matrix & matrix) const;
@@ -76,6 +125,9 @@ public:
 
     // Linear algebra operations
     [[nodiscard]] Matrix lin_solve(const Matrix & b) const;
+    // TODO -> Check terminology
+    [[nodiscard]] bool is_chevron() const;
+    [[nodiscard]] Matrix adjusted_matrix() const;
 
 private:
     std::vector<double> data;
@@ -88,6 +140,7 @@ private:
 };
 
 #include "matrix_iterator.h"
-#include "matrix_row_column_iterator.h"
-#include "matrix_row_column_view.h"
+#include "matrix_slice_views.h"
+#include "matrix_slice_iterators.h"
 
+#endif // MATRIX_LIB_MATRIX_H
