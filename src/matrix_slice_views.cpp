@@ -1,6 +1,5 @@
 #include "matrix_slice_views.h"
-
-#include <ostream>
+#include "utils/external_deps.h"
 
 template <bool IsConst>
 Matrix::RowViewBase<IsConst>::RowViewBase(MatrixT* matrix, const size_t y) : matrix(matrix), y(y) {

@@ -5,7 +5,8 @@
 #include <iterator>
 #include <ranges>
 
-#include "../src/matrix.h"
+#include "../src/matrix_lib.h"
+#include "../src/utils/std_extensions.h"
 
 TEST(MatrixIterator, RowIteratorReturnsAllRowViews) {
     Matrix matrix{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};

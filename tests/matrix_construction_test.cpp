@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
 
 #include <iostream>
+#include <limits>
 
-#include "../src/matrix.h"
+#include "../src/matrix_lib.h"
 
 TEST(MatrixConstruction, InitializesSizedMatrixWithZeros) {
     const Matrix matrix(3, 2);
@@ -11,6 +12,20 @@ TEST(MatrixConstruction, InitializesSizedMatrixWithZeros) {
     EXPECT_DOUBLE_EQ(matrix.at(0, 0), 0.0);
     EXPECT_DOUBLE_EQ(matrix.at(1, 0), 0.0);
     EXPECT_DOUBLE_EQ(matrix.at(2, 1), 0.0);
+}
+
+TEST(MatrixConstruction, RejectsDimensionsWhoseProductOverflows) {
+    EXPECT_THROW(
+        (Matrix(std::numeric_limits<size_t>::max(), 2)),
+        std::length_error
+    );
+}
+
+TEST(MatrixConstruction, ExposesRowAndColumnCounts) {
+    const Matrix matrix(3, 2);
+
+    EXPECT_EQ(matrix.row_count(), 2u);
+    EXPECT_EQ(matrix.column_count(), 3u);
 }
 
 TEST(MatrixConstruction, BuildsFromInitializerLists) {

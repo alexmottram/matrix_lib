@@ -1,23 +1,27 @@
-#include "matrix.h"
+#include "matrix_lib.h"
 
-#include <iomanip>
-#include <sstream>
+#include "utils/external_deps.h"
 
-Matrix::Matrix(const size_t size_x, const size_t size_y) {
-    this->size_x = size_x;
-    this->size_y = size_y;
-    this->data = std::vector<double>(size_x * size_y, 0.0);
+namespace {
+size_t checked_element_count(const size_t size_x, const size_t size_y) {
+    if (size_x != 0 && size_y > std::numeric_limits<size_t>::max() / size_x) {
+        throw std::length_error("Matrix dimensions exceed the maximum element count");
+    }
+    return size_x * size_y;
+}
 }
 
-Matrix::Matrix(const std::initializer_list<std::initializer_list<double>> values) {
-    size_y = values.size();
-    size_x = 0;
+Matrix::Matrix(const size_t size_x, const size_t size_y)
+    : data(checked_element_count(size_x, size_y), 0.0), size_x(size_x), size_y(size_y) {
+}
 
-    if (size_y > 0) {
+Matrix::Matrix(const std::initializer_list<std::initializer_list<double>> values)
+    : size_y(values.size()) {
+    if (values.size() != 0) {
         size_x = values.begin()->size();
     }
 
-    data.reserve(size_x * size_y);
+    data.reserve(checked_element_count(size_x, size_y));
 
     for (const auto& row : values) {
         if (row.size() != size_x) {
@@ -56,6 +60,14 @@ double& Matrix::at(const size_t x, const size_t y) {
 
 const double& Matrix::at(const size_t x, const size_t y) const {
     return data.at(coord_to_index(x, y));
+}
+
+size_t Matrix::row_count() const noexcept {
+    return size_y;
+}
+
+size_t Matrix::column_count() const noexcept {
+    return size_x;
 }
 
 Matrix::RowView Matrix::row_at(const size_t y) {
@@ -250,12 +262,12 @@ Matrix Matrix::lin_solve(const Matrix &b) const {
     return b;
 }
 
-bool Matrix::is_chevron() const {
+bool Matrix::is_echelon() const {
     return false;
 }
 
-Matrix Matrix::adjusted_matrix() const {
-    // Attempts to create an adjusted chevron matrix where each row
+Matrix Matrix::augmented_matrix() const {
+    // Attempts to create an adjusted echelon matrix where each row
     // contains more zero elements than the previous.
     return *this;
 }

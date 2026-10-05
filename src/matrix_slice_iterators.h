@@ -1,10 +1,8 @@
 #pragma once
 
 #include "matrix.h"
-
-#include <compare>
-#include <iterator>
-#include <type_traits>
+#include "matrix_slice_views.h"
+#include "utils/external_deps.h"
 
 // {row index, row view} pair yielded by RowIteratorBase.
 template <bool IsConst>

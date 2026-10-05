@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../src/matrix.h"
+#include "../src/matrix_lib.h"
 
 TEST(MatrixMatrixOperations, TransposeRowVector) {
     const Matrix original_matrix{{1, 2, 3, 4}};

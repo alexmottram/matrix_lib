@@ -9,8 +9,10 @@ include(CTest)
 add_library(matrix_lib src/matrix.cpp
         src/matrix_iterator.cpp
         src/matrix_slice_views.cpp
+        src/utils/external_deps.h
         src/utils/std_extensions.h
         src/matrix.h
+        src/matrix_lib.h
         src/matrix_iterator.h
         src/matrix_slice_iterators.h
         src/matrix_slice_views.h)

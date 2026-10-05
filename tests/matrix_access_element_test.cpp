@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../src/matrix.h"
+#include "../src/matrix_lib.h"
 
 // static_assert is a valid statement inside a TEST body, so this compile-time
 // check gets a named entry in the gtest output instead of being invisible

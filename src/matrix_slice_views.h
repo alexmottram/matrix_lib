@@ -1,11 +1,7 @@
 #pragma once
 
 #include "matrix.h"
-
-#include <compare>
-#include <iterator>
-#include <stdexcept>
-#include <type_traits>
+#include "utils/external_deps.h"
 
 // Random-access iterator over a single row of a Matrix, left to right. IsConst
 // selects between a mutable iterator (ElementReference, Matrix*) and a

@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../src/matrix.h"
+#include "../src/matrix_lib.h"
 
 TEST(MatrixBasicArithmetic, BasicMatrixAddition) {
     const Matrix matrix_a{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};

@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../src/matrix.h"
+#include "../src/matrix_lib.h"
 
 TEST(MatrixLinearSolver, SolvesSimpleLinearSystem) {
     const Matrix A{{1, 2, 1}, {3, 8, 1}, {0, 4, 1}};
@@ -18,11 +18,11 @@ TEST(MatrixLinearSolver, SolvesSimpleLinearSystem) {
     EXPECT_TRUE(computed_x == expected_x);
 }
 
-TEST(MatrixLinearSolver, IsChevronTrue) {
+TEST(MatrixLinearSolver, IsEchelonTrue) {
 	const Matrix A{{1, 1, 1}, {0, 1, 1}, {0, 0,1}};
 
-	std::cout << "Testing that the following matrices are all chevron matrices" << std::endl;
+	std::cout << "Testing that the following matrix is in echelon form" << std::endl;
 
-	std::cout << "Matrix A is chevron: " << A.is_chevron() << '\n' << A << std::endl;
-	EXPECT_TRUE(A.is_chevron());
+	std::cout << "Matrix A is in echelon form: " << A.is_echelon() << '\n' << A << std::endl;
+	EXPECT_TRUE(A.is_echelon());
 }

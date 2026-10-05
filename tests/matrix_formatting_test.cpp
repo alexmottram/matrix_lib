@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "../src/matrix.h"
+#include "../src/matrix_lib.h"
 
 TEST(MatrixFormatting, AlignsColumnsWhenPrinted) {
     const Matrix matrix{{1, 2.2, 3}, {4, 5, 6}, {70001, 8, 95}};

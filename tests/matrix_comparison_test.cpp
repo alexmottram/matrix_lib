@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../src/matrix.h"
+#include "../src/matrix_lib.h"
 
 TEST(MatrixComparison, TwoByTwoMatricesWithSameValuesAreEqual) {
     const Matrix matrix_a({{1, 2}, {3, 4}});

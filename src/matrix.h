@@ -3,15 +3,11 @@
 #ifndef MATRIX_LIB_MATRIX_H
 #define MATRIX_LIB_MATRIX_H
 
-#include <initializer_list>
-#include <iterator>
-#include <iostream>
-#include <iosfwd>
-#include <stdexcept>
-#include <vector>
-#include <list>
-#include <numeric>
-#include "utils/std_extensions.h"
+#include "utils/external_deps.h"
+
+// This header declares Matrix and forward-declares its iterator and view
+// types. Include matrix_lib.h to use iteration, rows()/columns() or
+// row_at()/column_at() views, which need the complete definitions.
 
 class Matrix {
 public:
@@ -67,7 +63,10 @@ public:
     [[nodiscard]] static Matrix row_vector(std::initializer_list<double> values);
     [[nodiscard]] static Matrix column_vector(std::initializer_list<double> values);
 
-    // Accessors
+    // Dimensions use the initializer-list convention: rows are y, columns are x.
+    [[nodiscard]] size_t row_count() const noexcept;
+    [[nodiscard]] size_t column_count() const noexcept;
+    // Element coordinates are (column, row).
     double& at(size_t x, size_t y);
     [[nodiscard]] const double& at(size_t x, size_t y) const;
     [[nodiscard]] RowView row_at(size_t y);
@@ -133,9 +132,8 @@ public:
 
     // Linear algebra operations
     [[nodiscard]] Matrix lin_solve(const Matrix & b) const;
-    // TODO -> Check terminology
-    [[nodiscard]] bool is_chevron() const;
-    [[nodiscard]] Matrix adjusted_matrix() const;
+    [[nodiscard]] bool is_echelon() const;
+    [[nodiscard]] Matrix augmented_matrix() const;
 
 private:
     std::vector<double> data;
@@ -146,9 +144,5 @@ private:
     [[nodiscard]] size_t index_to_x(size_t index) const;
     [[nodiscard]] size_t index_to_y(size_t index) const;
 };
-
-#include "matrix_iterator.h"
-#include "matrix_slice_views.h"
-#include "matrix_slice_iterators.h"
 
 #endif // MATRIX_LIB_MATRIX_H
