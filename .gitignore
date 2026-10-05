@@ -1,0 +1,19 @@
+# CMake build directories and generated files
+/build/
+/cmake-build-*/
+
+# Compiled artifacts
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+*.pdb
+*.ilk
+
+# Operating system files
+.DS_Store
+Thumbs.db
