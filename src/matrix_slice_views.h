@@ -2,70 +2,136 @@
 
 #include "matrix.h"
 
+#include <compare>
+#include <iterator>
 #include <stdexcept>
 #include <type_traits>
 
-// Forward-iterates over a single row of a Matrix, left to right. IsConst
+// Random-access iterator over a single row of a Matrix, left to right. IsConst
 // selects between a mutable iterator (ElementReference, Matrix*) and a
 // read-only iterator (ConstElementReference, const Matrix*) sharing one
-// implementation. RowIterator/ConstRowIterator are aliases for the two
+// implementation. RowViewIterator/ConstRowViewIterator are aliases for the two
 // instantiations actually used (declared in matrix.h).
 template <bool IsConst>
 class Matrix::RowViewIteratorBase {
     using MatrixT = std::conditional_t<IsConst, const Matrix, Matrix>;
 
 public:
-    using iterator_category = std::forward_iterator_tag;
+    using iterator_category = std::input_iterator_tag; // operator* returns by value
+    using iterator_concept = std::random_access_iterator_tag;
     using value_type = std::conditional_t<IsConst, ConstElementReference, ElementReference>;
     using difference_type = std::ptrdiff_t;
     using reference = value_type;
 
-    RowViewIteratorBase(MatrixT* matrix, size_t y, size_t x);
+    RowViewIteratorBase() = default;
 
-    [[nodiscard]] reference operator*() const;
-    RowViewIteratorBase& operator++();
-    RowViewIteratorBase operator++(int);
-    [[nodiscard]] bool operator==(const RowViewIteratorBase& other) const;
-    [[nodiscard]] bool operator!=(const RowViewIteratorBase& other) const;
+    [[nodiscard]] reference operator*() const { return reference{x, y, matrix->data.at(matrix->coord_to_index(x, y))}; }
+    RowViewIteratorBase& operator++() {
+        ++x;
+        return *this;
+    }
+    RowViewIteratorBase operator++(int) {
+        const RowViewIteratorBase copy(*this);
+        ++(*this);
+        return copy;
+    }
+    RowViewIteratorBase& operator--() {
+        --x;
+        return *this;
+    }
+    RowViewIteratorBase operator--(int) {
+        const RowViewIteratorBase copy(*this);
+        --(*this);
+        return copy;
+    }
+    RowViewIteratorBase& operator+=(const difference_type n) {
+        x = static_cast<size_t>(static_cast<difference_type>(x) + n);
+        return *this;
+    }
+    RowViewIteratorBase& operator-=(const difference_type n) { return *this += -n; }
+    [[nodiscard]] friend RowViewIteratorBase operator+(RowViewIteratorBase it, const difference_type n) { return it += n; }
+    [[nodiscard]] friend RowViewIteratorBase operator+(const difference_type n, RowViewIteratorBase it) { return it += n; }
+    [[nodiscard]] friend RowViewIteratorBase operator-(RowViewIteratorBase it, const difference_type n) { return it -= n; }
+    [[nodiscard]] friend difference_type operator-(const RowViewIteratorBase& a, const RowViewIteratorBase& b) {
+        return static_cast<difference_type>(a.x) - static_cast<difference_type>(b.x);
+    }
+    [[nodiscard]] reference operator[](const difference_type n) const { return *(*this + n); }
+    [[nodiscard]] auto operator<=>(const RowViewIteratorBase&) const = default;
 
 private:
-    MatrixT* matrix;
-    size_t y;
-    size_t x;
+    friend class RowViewBase<IsConst>;
+
+    RowViewIteratorBase(MatrixT* matrix, const size_t y, const size_t x) : matrix(matrix), y(y), x(x) {}
+
+    MatrixT* matrix = nullptr;
+    size_t y = 0;
+    size_t x = 0;
 };
 
-// Forward-iterates over a single column of a Matrix, top to bottom. IsConst
+// Random-access iterator over a single column of a Matrix, top to bottom. IsConst
 // selects between a mutable iterator (ElementReference, Matrix*) and a
 // read-only iterator (ConstElementReference, const Matrix*) sharing one
-// implementation. ColumnIterator/ConstColumnIterator are aliases for the two
+// implementation. ColumnViewIterator/ConstColumnViewIterator are aliases for the two
 // instantiations actually used (declared in matrix.h).
 template <bool IsConst>
 class Matrix::ColumnViewIteratorBase {
     using MatrixT = std::conditional_t<IsConst, const Matrix, Matrix>;
 
 public:
-    using iterator_category = std::forward_iterator_tag;
+    using iterator_category = std::input_iterator_tag; // operator* returns by value
+    using iterator_concept = std::random_access_iterator_tag;
     using value_type = std::conditional_t<IsConst, ConstElementReference, ElementReference>;
     using difference_type = std::ptrdiff_t;
     using reference = value_type;
 
-    ColumnViewIteratorBase(MatrixT* matrix, size_t x, size_t y);
+    ColumnViewIteratorBase() = default;
 
-    [[nodiscard]] reference operator*() const;
-    ColumnViewIteratorBase& operator++();
-    ColumnViewIteratorBase operator++(int);
-    [[nodiscard]] bool operator==(const ColumnViewIteratorBase& other) const;
-    [[nodiscard]] bool operator!=(const ColumnViewIteratorBase& other) const;
+    [[nodiscard]] reference operator*() const { return reference{x, y, matrix->data.at(matrix->coord_to_index(x, y))}; }
+    ColumnViewIteratorBase& operator++() {
+        ++y;
+        return *this;
+    }
+    ColumnViewIteratorBase operator++(int) {
+        const ColumnViewIteratorBase copy(*this);
+        ++(*this);
+        return copy;
+    }
+    ColumnViewIteratorBase& operator--() {
+        --y;
+        return *this;
+    }
+    ColumnViewIteratorBase operator--(int) {
+        const ColumnViewIteratorBase copy(*this);
+        --(*this);
+        return copy;
+    }
+    ColumnViewIteratorBase& operator+=(const difference_type n) {
+        y = static_cast<size_t>(static_cast<difference_type>(y) + n);
+        return *this;
+    }
+    ColumnViewIteratorBase& operator-=(const difference_type n) { return *this += -n; }
+    [[nodiscard]] friend ColumnViewIteratorBase operator+(ColumnViewIteratorBase it, const difference_type n) { return it += n; }
+    [[nodiscard]] friend ColumnViewIteratorBase operator+(const difference_type n, ColumnViewIteratorBase it) { return it += n; }
+    [[nodiscard]] friend ColumnViewIteratorBase operator-(ColumnViewIteratorBase it, const difference_type n) { return it -= n; }
+    [[nodiscard]] friend difference_type operator-(const ColumnViewIteratorBase& a, const ColumnViewIteratorBase& b) {
+        return static_cast<difference_type>(a.y) - static_cast<difference_type>(b.y);
+    }
+    [[nodiscard]] reference operator[](const difference_type n) const { return *(*this + n); }
+    [[nodiscard]] auto operator<=>(const ColumnViewIteratorBase&) const = default;
 
 private:
-    MatrixT* matrix;
-    size_t x;
-    size_t y;
+    friend class ColumnViewBase<IsConst>;
+
+    ColumnViewIteratorBase(MatrixT* matrix, const size_t x, const size_t y) : matrix(matrix), x(x), y(y) {}
+
+    MatrixT* matrix = nullptr;
+    size_t x = 0;
+    size_t y = 0;
 };
 
 // Non-owning view over a single row of a Matrix. IsConst selects between a
-// mutable view (double&, RowIterator) and a read-only view (const double&,
-// ConstRowIterator) sharing one implementation. RowView/ConstRowView are
+// mutable view (double&, RowViewIterator) and a read-only view (const double&,
+// ConstRowViewIterator) sharing one implementation. RowView/ConstRowView are
 // aliases for the two instantiations actually used (declared in matrix.h).
 template <bool IsConst>
 class Matrix::RowViewBase {
@@ -96,8 +162,8 @@ template <bool IsConst>
 std::ostream& operator<<(std::ostream& os, const Matrix::RowViewBase<IsConst>& row);
 
 // Non-owning view over a single column of a Matrix. IsConst selects between a
-// mutable view (double&, ColumnIterator) and a read-only view (const double&,
-// ConstColumnIterator) sharing one implementation. ColumnView/ConstColumnView
+// mutable view (double&, ColumnViewIterator) and a read-only view (const double&,
+// ConstColumnViewIterator) sharing one implementation. ColumnView/ConstColumnView
 // are aliases for the two instantiations actually used (declared in
 // matrix.h).
 template <bool IsConst>
@@ -140,7 +206,3 @@ extern template std::ostream& operator<<(std::ostream&, const Matrix::RowViewBas
 extern template std::ostream& operator<<(std::ostream&, const Matrix::RowViewBase<true>&);
 extern template std::ostream& operator<<(std::ostream&, const Matrix::ColumnViewBase<false>&);
 extern template std::ostream& operator<<(std::ostream&, const Matrix::ColumnViewBase<true>&);
-extern template class Matrix::RowViewIteratorBase<false>;
-extern template class Matrix::RowViewIteratorBase<true>;
-extern template class Matrix::ColumnViewIteratorBase<false>;
-extern template class Matrix::ColumnViewIteratorBase<true>;

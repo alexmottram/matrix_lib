@@ -120,21 +120,22 @@ Matrix::ConstIterator Matrix::end() const {
     return ConstIterator(this, data.size());
 }
 
-Matrix::RowIteratorConstructor Matrix::row_iterator() {
-    return RowIteratorConstructor(this);
+Matrix::RowRange Matrix::rows() & {
+    return RowRange(this);
 }
 
-Matrix::ConstRowIteratorConstructor Matrix::row_iterator() const {
-    return ConstRowIteratorConstructor(this);
+Matrix::ConstRowRange Matrix::rows() const & {
+    return ConstRowRange(this);
 }
 
-Matrix::ColumnIteratorConstructor Matrix::column_iterator() {
-    return ColumnIteratorConstructor(this);
+Matrix::ColumnRange Matrix::columns() & {
+    return ColumnRange(this);
 }
 
-Matrix::ConstColumnIteratorConstructor Matrix::column_iterator() const {
-    return ConstColumnIteratorConstructor(this);
+Matrix::ConstColumnRange Matrix::columns() const & {
+    return ConstColumnRange(this);
 }
+
 Matrix Matrix::operator+(const Matrix &matrix) const {
     if (size_x != matrix.size_x || size_y != matrix.size_y) {
         throw std::invalid_argument("Matrix dimensions must match for addition");

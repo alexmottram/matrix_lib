@@ -35,10 +35,10 @@ public:
     class Iterator;
     class ConstIterator;
 
-    // TODO -> Do the view iterators need to be defined before the views?
-    // RowIteratorBase<IsConst> and ColumnIteratorBase<IsConst> are templated
-    // on constness so the mutable and read-only iterators share a single
-    // implementation. RowIterator/ConstRowIterator (and the column
+    // RowViewIteratorBase<IsConst> and ColumnViewIteratorBase<IsConst> iterate
+    // over the elements of a single row/column view. They are templated on
+    // constness so the mutable and read-only iterators share one
+    // implementation; RowViewIterator/ConstRowViewIterator (and the column
     // equivalents) are aliases for the two instantiations actually used.
     template <bool IsConst> class RowViewIteratorBase;
     template <bool IsConst> class ColumnViewIteratorBase;
@@ -87,31 +87,39 @@ public:
     [[nodiscard]] ConstIterator begin() const;
     [[nodiscard]] ConstIterator end() const;
 
-    // Row/column iterators (which yield whole row/column views), their
-    // begin()/end() providers and {index, view} reference structs are
-    // templated on constness. Defined in matrix_slice_iterators.h.
+    // Row/column ranges (returned by rows()/columns()) yield whole
+    // row/column views as {index, view} references. RowRangeBase<IsConst> and
+    // RowIteratorBase<IsConst> (and the column equivalents) are templated on
+    // constness. Defined in matrix_slice_iterators.h.
     template <bool IsConst> struct RowViewReferenceBase;
     template <bool IsConst> class RowIteratorBase;
-    template <bool IsConst> class RowIteratorConstructorBase;
+    template <bool IsConst> class RowRangeBase;
     template <bool IsConst> struct ColumnViewReferenceBase;
     template <bool IsConst> class ColumnIteratorBase;
-    template <bool IsConst> class ColumnIteratorConstructorBase;
+    template <bool IsConst> class ColumnRangeBase;
     using RowViewReference = RowViewReferenceBase<false>;
     using ConstRowViewReference = RowViewReferenceBase<true>;
     using RowIterator = RowIteratorBase<false>;
     using ConstRowIterator = RowIteratorBase<true>;
-    using RowIteratorConstructor = RowIteratorConstructorBase<false>;
-    using ConstRowIteratorConstructor = RowIteratorConstructorBase<true>;
+    using RowRange = RowRangeBase<false>;
+    using ConstRowRange = RowRangeBase<true>;
     using ColumnViewReference = ColumnViewReferenceBase<false>;
     using ConstColumnViewReference = ColumnViewReferenceBase<true>;
     using ColumnIterator = ColumnIteratorBase<false>;
     using ConstColumnIterator = ColumnIteratorBase<true>;
-    using ColumnIteratorConstructor = ColumnIteratorConstructorBase<false>;
-    using ConstColumnIteratorConstructor = ColumnIteratorConstructorBase<true>;
-    [[nodiscard]] RowIteratorConstructor row_iterator();
-    [[nodiscard]] ConstRowIteratorConstructor row_iterator() const;
-    [[nodiscard]] ColumnIteratorConstructor column_iterator();
-    [[nodiscard]] ConstColumnIteratorConstructor column_iterator() const;
+    using ColumnRange = ColumnRangeBase<false>;
+    using ConstColumnRange = ColumnRangeBase<true>;
+
+    // The ranges hold a pointer to the matrix, so calling these on a
+    // temporary would dangle; the rvalue overloads are deleted.
+    [[nodiscard]] RowRange rows() &;
+    [[nodiscard]] ConstRowRange rows() const &;
+    void rows() && = delete;
+    void rows() const && = delete;
+    [[nodiscard]] ColumnRange columns() &;
+    [[nodiscard]] ConstColumnRange columns() const &;
+    void columns() && = delete;
+    void columns() const && = delete;
 
     // Basic mathematical operations
     [[nodiscard]] Matrix operator+(const Matrix & matrix) const;
