@@ -70,7 +70,7 @@ size_t Matrix::column_count() const noexcept {
     return size_x;
 }
 
-Matrix::RowView Matrix::row_at(const size_t y) {
+Matrix::RowView Matrix::row_at(const size_t y) & {
     if (y >= size_y) {
         throw std::out_of_range("Matrix row index out of range");
     }
@@ -78,7 +78,7 @@ Matrix::RowView Matrix::row_at(const size_t y) {
     return RowView(this, y);
 }
 
-Matrix::ConstRowView Matrix::row_at(const size_t y) const {
+Matrix::ConstRowView Matrix::row_at(const size_t y) const & {
     if (y >= size_y) {
         throw std::out_of_range("Matrix row index out of range");
     }
@@ -86,7 +86,15 @@ Matrix::ConstRowView Matrix::row_at(const size_t y) const {
     return ConstRowView(this, y);
 }
 
-Matrix::ColumnView Matrix::column_at(const size_t x) {
+Matrix Matrix::row_at(const size_t y) && {
+    return static_cast<const Matrix&&>(*this).row_at(y);
+}
+
+Matrix Matrix::row_at(const size_t y) const && {
+    return static_cast<const Matrix&>(*this).row_at(y).copy();
+}
+
+Matrix::ColumnView Matrix::column_at(const size_t x) & {
     if (x >= size_x) {
         throw std::out_of_range("Matrix column index out of range");
     }
@@ -94,12 +102,20 @@ Matrix::ColumnView Matrix::column_at(const size_t x) {
     return ColumnView(this, x);
 }
 
-Matrix::ConstColumnView Matrix::column_at(const size_t x) const {
+Matrix::ConstColumnView Matrix::column_at(const size_t x) const & {
     if (x >= size_x) {
         throw std::out_of_range("Matrix column index out of range");
     }
 
     return ConstColumnView(this, x);
+}
+
+Matrix Matrix::column_at(const size_t x) && {
+    return static_cast<const Matrix&&>(*this).column_at(x);
+}
+
+Matrix Matrix::column_at(const size_t x) const && {
+    return static_cast<const Matrix&>(*this).column_at(x).copy();
 }
 
 bool Matrix::operator==(const Matrix &matrix) const {
@@ -216,7 +232,8 @@ Matrix Matrix::transpose() const {
     return result;
 }
 
-// TODO complete this
+// TODO: Implement lin_solve(), is_echelon(), and augmented_matrix(); they are
+// intentionally incomplete for now.
 Matrix Matrix::lin_solve(const Matrix &b) const {
 
     // Throw error if b is not a column vector

@@ -69,10 +69,16 @@ public:
     // Element coordinates are (column, row).
     double& at(size_t x, size_t y);
     [[nodiscard]] const double& at(size_t x, size_t y) const;
-    [[nodiscard]] RowView row_at(size_t y);
-    [[nodiscard]] ConstRowView row_at(size_t y) const;
-    [[nodiscard]] ColumnView column_at(size_t x);
-    [[nodiscard]] ConstColumnView column_at(size_t x) const;
+    // Lvalues provide non-owning views; rvalues return owning row/column
+    // matrices so a result stored from a temporary cannot dangle.
+    [[nodiscard]] RowView row_at(size_t y) &;
+    [[nodiscard]] ConstRowView row_at(size_t y) const &;
+    [[nodiscard]] Matrix row_at(size_t y) &&;
+    [[nodiscard]] Matrix row_at(size_t y) const &&;
+    [[nodiscard]] ColumnView column_at(size_t x) &;
+    [[nodiscard]] ConstColumnView column_at(size_t x) const &;
+    [[nodiscard]] Matrix column_at(size_t x) &&;
+    [[nodiscard]] Matrix column_at(size_t x) const &&;
 
     // Output
     friend std::ostream& operator<<(std::ostream& os, const Matrix& a);

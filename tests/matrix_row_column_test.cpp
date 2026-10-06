@@ -115,6 +115,24 @@ TEST(MatrixAccessRowColumn, ViewReplaceRejectsDifferentSizesWithoutChangingDesti
     EXPECT_DOUBLE_EQ(matrix.at(1, 0), 2.0);
 }
 
+TEST(MatrixAccessRowColumn, RowViewCopyReturnsIndependentRowMatrix) {
+    Matrix matrix{{1, 2, 3}, {4, 5, 6}};
+    const Matrix row_copy = matrix.row_at(1).copy();
+    const Matrix expected_row{{4, 5, 6}};
+
+    matrix.at(0, 1) = 40;
+
+    EXPECT_EQ(row_copy, expected_row);
+}
+
+TEST(MatrixAccessRowColumn, ConstColumnViewCopyReturnsIndependentColumnMatrix) {
+    const Matrix matrix{{1, 2, 3}, {4, 5, 6}};
+    const Matrix column_copy = matrix.column_at(1).copy();
+    const Matrix expected_column{{2}, {5}};
+
+    EXPECT_EQ(column_copy, expected_column);
+}
+
 TEST(MatrixAccessRowColumn, RowIteratorVisitsElementsInOrderWithCoordinates) {
     Matrix matrix{{1, 2, 3}, {4, 5, 6}};
 
@@ -185,4 +203,18 @@ TEST(MatrixAccessRowColumn, ThrowsForOutOfRangeRowOrColumnIndex) {
     EXPECT_THROW((void)matrix.column_at(2), std::out_of_range);
     EXPECT_THROW((void)const_matrix.row_at(2), std::out_of_range);
     EXPECT_THROW((void)const_matrix.column_at(2), std::out_of_range);
+}
+
+TEST(MatrixAccessRowColumn, TemporaryRowAndColumnAccessReturnOwningMatrices) {
+    const Matrix row = Matrix{{1, 2, 3}, {4, 5, 6}}.row_at(1);
+    const Matrix column = Matrix{{1, 2, 3}, {4, 5, 6}}.column_at(1);
+    const Matrix expected_row{{4, 5, 6}};
+    const Matrix expected_column{{2}, {5}};
+
+    EXPECT_EQ(row.row_count(), 1u);
+    EXPECT_EQ(row.column_count(), 3u);
+    EXPECT_EQ(row, expected_row);
+    EXPECT_EQ(column.row_count(), 2u);
+    EXPECT_EQ(column.column_count(), 1u);
+    EXPECT_EQ(column, expected_column);
 }
