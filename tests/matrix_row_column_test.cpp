@@ -133,6 +133,18 @@ TEST(MatrixAccessRowColumn, ConstColumnViewCopyReturnsIndependentColumnMatrix) {
     EXPECT_EQ(column_copy, expected_column);
 }
 
+TEST(MatrixAccessRowColumn, RowViewConvertsToVectorInLeftToRightOrder) {
+    const Matrix matrix{{1, 2, 3}, {4, 5, 6}};
+
+    EXPECT_EQ(matrix.row_at(1).to_vector(), (std::vector<double>{4, 5, 6}));
+}
+
+TEST(MatrixAccessRowColumn, ColumnViewConvertsToVectorInTopToBottomOrder) {
+    Matrix matrix{{1, 2, 3}, {4, 5, 6}};
+
+    EXPECT_EQ(matrix.column_at(1).to_vector(), (std::vector<double>{2, 5}));
+}
+
 TEST(MatrixAccessRowColumn, RowIteratorVisitsElementsInOrderWithCoordinates) {
     Matrix matrix{{1, 2, 3}, {4, 5, 6}};
 

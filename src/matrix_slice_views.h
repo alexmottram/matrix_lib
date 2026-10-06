@@ -142,6 +142,7 @@ public:
     [[nodiscard]] size_t size() const;
     [[nodiscard]] Iter begin() const;
     [[nodiscard]] Iter end() const;
+    [[nodiscard]] std::vector<double> to_vector() const;
     [[nodiscard]] Matrix copy() const;
 
     // Copies source's values into this row. A read-only view cannot be the
@@ -176,6 +177,7 @@ public:
     [[nodiscard]] size_t size() const;
     [[nodiscard]] Iter begin() const;
     [[nodiscard]] Iter end() const;
+    [[nodiscard]] std::vector<double> to_vector() const;
     [[nodiscard]] Matrix copy() const;
 
     // Copies source's values into this column. A read-only view cannot be the

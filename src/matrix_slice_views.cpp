@@ -26,6 +26,16 @@ typename Matrix::RowViewBase<IsConst>::Iter Matrix::RowViewBase<IsConst>::end() 
 }
 
 template <bool IsConst>
+std::vector<double> Matrix::RowViewBase<IsConst>::to_vector() const {
+    std::vector<double> result;
+    result.reserve(size());
+    for (size_t x = 0; x < size(); ++x) {
+        result.push_back(at(x));
+    }
+    return result;
+}
+
+template <bool IsConst>
 Matrix Matrix::RowViewBase<IsConst>::copy() const {
     Matrix result(size(), 1);
     for (size_t x = 0; x < size(); ++x) {
@@ -83,6 +93,16 @@ typename Matrix::ColumnViewBase<IsConst>::Iter Matrix::ColumnViewBase<IsConst>::
 template <bool IsConst>
 typename Matrix::ColumnViewBase<IsConst>::Iter Matrix::ColumnViewBase<IsConst>::end() const {
     return Iter(matrix, x, matrix->size_y);
+}
+
+template <bool IsConst>
+std::vector<double> Matrix::ColumnViewBase<IsConst>::to_vector() const {
+    std::vector<double> result;
+    result.reserve(size());
+    for (size_t y = 0; y < size(); ++y) {
+        result.push_back(at(y));
+    }
+    return result;
 }
 
 template <bool IsConst>
