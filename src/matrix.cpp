@@ -75,7 +75,7 @@ Matrix::RowView Matrix::row_at(const size_t y) & {
         throw std::out_of_range("Matrix row index out of range");
     }
 
-    return RowView(this, y);
+    return {this, y};
 }
 
 Matrix::ConstRowView Matrix::row_at(const size_t y) const & {
@@ -83,7 +83,7 @@ Matrix::ConstRowView Matrix::row_at(const size_t y) const & {
         throw std::out_of_range("Matrix row index out of range");
     }
 
-    return ConstRowView(this, y);
+    return {this, y};
 }
 
 Matrix Matrix::row_at(const size_t y) && {
@@ -99,7 +99,7 @@ Matrix::ColumnView Matrix::column_at(const size_t x) & {
         throw std::out_of_range("Matrix column index out of range");
     }
 
-    return ColumnView(this, x);
+    return {this, x};
 }
 
 Matrix::ConstColumnView Matrix::column_at(const size_t x) const & {
@@ -107,7 +107,7 @@ Matrix::ConstColumnView Matrix::column_at(const size_t x) const & {
         throw std::out_of_range("Matrix column index out of range");
     }
 
-    return ConstColumnView(this, x);
+    return {this, x};
 }
 
 Matrix Matrix::column_at(const size_t x) && {
@@ -118,14 +118,16 @@ Matrix Matrix::column_at(const size_t x) const && {
     return static_cast<const Matrix&>(*this).column_at(x).copy();
 }
 
-void Matrix::swap_rows(size_t row1, size_t row2) {
+void Matrix::swap_rows(const size_t row1, const size_t row2) {
     if (row1 >= size_y) {
         throw std::out_of_range("Matrix row index row 1 out of range");
     }
     if (row2 >= size_y) {
         throw std::out_of_range("Matrix row index row 2 out of range");
     }
-    const RowView row_1_copy = this->row_at(row1).copy();
+    // TODO -> I have some concerns over the Const correctness here
+    const Matrix row_1_matrix_copy = this->row_at(row1).copy();
+    const ConstRowView row_1_copy = row_1_matrix_copy.row_at(0);
     const RowView row_2_copy = this->row_at(row2);
     this->row_at(row1).replace(row_2_copy);
     this->row_at(row2).replace(row_1_copy);
