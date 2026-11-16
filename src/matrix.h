@@ -82,8 +82,8 @@ public:
 
     // Methods that modify the contents of a matrix and should only be
     // available for non-const Matrices
-    [[nodiscard]] void swap_rows(size_t row1, size_t row2);
-    [[nodiscard]] void swap_rows(size_t row1, size_t row2) const = delete;
+    void swap_rows(size_t row1, size_t row2);
+    void swap_rows(size_t row1, size_t row2) const = delete;
 
     // Output
     friend std::ostream& operator<<(std::ostream& os, const Matrix& a);
@@ -142,9 +142,9 @@ public:
     [[nodiscard]] Matrix transpose() const;
 
     // Linear algebra operations
-    [[nodiscard]] Matrix lin_solve(const Matrix & b) const;
-    [[nodiscard]] bool is_row_echelon_form() const;
-    [[nodiscard]] Matrix augmented_matrix() const;
+    // [[nodiscard]] Matrix lin_solve(const Matrix & b) const;
+    // [[nodiscard]] bool is_row_echelon_form() const;
+    // [[nodiscard]] Matrix augmented_matrix() const;
 
 private:
     std::vector<double> data;

@@ -125,12 +125,13 @@ void Matrix::swap_rows(const size_t row1, const size_t row2) {
     if (row2 >= size_y) {
         throw std::out_of_range("Matrix row index row 2 out of range");
     }
-    // TODO -> I have some concerns over the Const correctness here
-    const Matrix row_1_matrix_copy = this->row_at(row1).copy();
-    const ConstRowView row_1_copy = row_1_matrix_copy.row_at(0);
-    const RowView row_2_copy = this->row_at(row2);
-    this->row_at(row1).replace(row_2_copy);
-    this->row_at(row2).replace(row_1_copy);
+    if (row1 == row2) {
+        return;
+    }
+    // Both rows are written, so swap in place: no temporary matrix or views.
+    for (size_t x = 0; x < size_x; ++x) {
+        std::swap(at(x, row1), at(x, row2));
+    }
 }
 
 bool Matrix::operator==(const Matrix &matrix) const {
@@ -160,7 +161,7 @@ Matrix::ConstIterator Matrix::begin() const {
 }
 
 Matrix::ConstIterator Matrix::end() const {
-    return ConstIterator(this, data.size());
+    return {this, data.size()};
 }
 
 Matrix::RowRange Matrix::rows() & {

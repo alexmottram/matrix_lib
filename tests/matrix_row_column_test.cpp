@@ -274,3 +274,23 @@ TEST(MatrixAccessRowColumn, RowSwapSwapsTwoRowsCorrectly) {
     std::cout << "Matrix after row swap:\n" << matrix << '\n';
     EXPECT_EQ(matrix, expected_matrix);
 }
+
+TEST(MatrixAccessRowColumn, RowSwapWithSameRowLeavesMatrixUnchanged) {
+    Matrix matrix{{1, 2, 3}, {4, 5, 6}};
+    const Matrix expected_matrix{{1, 2, 3}, {4, 5, 6}};
+
+    std::cout << "Swapping row 1 with itself should be a no-op. Matrix:\n" << matrix << '\n';
+    matrix.swap_rows(1, 1);
+    std::cout << "Matrix after swap_rows(1, 1):\n" << matrix << '\n';
+    EXPECT_EQ(matrix, expected_matrix);
+}
+
+TEST(MatrixAccessRowColumn, RowSwapThrowsOnOutOfRangeIndexAndLeavesMatrixUnchanged) {
+    Matrix matrix{{1, 2}, {3, 4}};
+    const Matrix expected_matrix{{1, 2}, {3, 4}};
+
+    std::cout << "swap_rows(0, 2) and swap_rows(2, 0) on a 2-row matrix must throw std::out_of_range without modifying:\n" << matrix << '\n';
+    EXPECT_THROW(matrix.swap_rows(0, 2), std::out_of_range);
+    EXPECT_THROW(matrix.swap_rows(2, 0), std::out_of_range);
+    EXPECT_EQ(matrix, expected_matrix);
+}
