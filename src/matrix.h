@@ -80,6 +80,11 @@ public:
     [[nodiscard]] Matrix column_at(size_t x) &&;
     [[nodiscard]] Matrix column_at(size_t x) const &&;
 
+    // Methods that modify the contents of a matrix and should only be
+    // available for non-const Matrices
+    [[nodiscard]] void swap_rows(size_t row1, size_t row2);
+    [[nodiscard]] void swap_rows(size_t row1, size_t row2) const = delete;
+
     // Output
     friend std::ostream& operator<<(std::ostream& os, const Matrix& a);
 
@@ -138,7 +143,7 @@ public:
 
     // Linear algebra operations
     [[nodiscard]] Matrix lin_solve(const Matrix & b) const;
-    [[nodiscard]] bool is_echelon() const;
+    [[nodiscard]] bool is_row_echelon_form() const;
     [[nodiscard]] Matrix augmented_matrix() const;
 
 private:

@@ -147,9 +147,9 @@ public:
 
     // Copies source's values into this row. A read-only view cannot be the
     // destination.
-    template <bool SourceIsConst>
-        requires (!IsConst)
+    template <bool SourceIsConst> requires (!IsConst)
     void replace(const RowViewBase<SourceIsConst>& source) const;
+
 
 private:
     MatrixT* matrix;

@@ -118,6 +118,19 @@ Matrix Matrix::column_at(const size_t x) const && {
     return static_cast<const Matrix&>(*this).column_at(x).copy();
 }
 
+void Matrix::swap_rows(size_t row1, size_t row2) {
+    if (row1 >= size_y) {
+        throw std::out_of_range("Matrix row index row 1 out of range");
+    }
+    if (row2 >= size_y) {
+        throw std::out_of_range("Matrix row index row 2 out of range");
+    }
+    const RowView row_1_copy = this->row_at(row1).copy();
+    const RowView row_2_copy = this->row_at(row2);
+    this->row_at(row1).replace(row_2_copy);
+    this->row_at(row2).replace(row_1_copy);
+}
+
 bool Matrix::operator==(const Matrix &matrix) const {
     if (size_x != matrix.size_x || size_y != matrix.size_y) {
         return false;
@@ -231,64 +244,6 @@ Matrix Matrix::transpose() const {
 
     return result;
 }
-
-// TODO: Implement lin_solve(), is_echelon(), and augmented_matrix(); they are
-// intentionally incomplete for now.
-Matrix Matrix::lin_solve(const Matrix &b) const {
-
-    // Throw error if b is not a column vector
-    if (b.size_x != 1) {
-        throw std::invalid_argument("Matrix b must be a column vector");
-    }
-
-    // Throw error if matrix is not square
-    if (size_x != size_y) {
-        throw std::invalid_argument("Matrix must be square");
-    }
-
-    // Throw error if column length doesn't match
-    if (size_y != b.size_y) {
-        throw std::invalid_argument("Matrix and column vector must have the same number of rows");
-    }
-
-    // TODO Create row access operators first
-    std::list<size_t> rows_remaining(size_y);
-    std::iota(rows_remaining.begin(), rows_remaining.end(), 0);
-    std::list<size_t> rows_ordered;
-
-    // for (auto i = 0; i < size_y; ++i) {
-    //
-    //     while (!rows_remaining.empty()) {
-    //         iteration_number++;
-    //
-    //         for (auto row_it = rows_remaining.begin(); row_it != rows_remaining.end(); ++row_it) {
-    //
-    //             // If row has a non-zero pivot, move it to the ordered list and break to restart scanning
-    //             non_zero_pivot = at()
-    //
-    //
-    //             if (matches(*row_it)) {
-    //                 rows_ordered.splice(rows_ordered.end(), rows_remaining, it);
-    //
-    //                 break; // restart scanning from rows_remaining.begin()
-    //             }
-    //         }
-    //     }
-    // }
-
-    return b;
-}
-
-bool Matrix::is_echelon() const {
-    return false;
-}
-
-Matrix Matrix::augmented_matrix() const {
-    // Attempts to create an adjusted echelon matrix where each row
-    // contains more zero elements than the previous.
-    return *this;
-}
-
 
 size_t Matrix::coord_to_index(const size_t x, const size_t y) const {
     if (x >= size_x || y >= size_y) {

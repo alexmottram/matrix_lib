@@ -7,6 +7,7 @@ include(FetchContent)
 include(CTest)
 
 add_library(matrix_lib src/matrix.cpp
+        src/matrix_linear_algebra.cpp
         src/matrix_iterator.cpp
         src/matrix_slice_views.cpp
         src/utils/external_deps.h
@@ -37,7 +38,7 @@ add_executable(matrix_tests
         tests/matrix_row_column_test.cpp
         tests/matrix_basic_arithmetic_operations.cpp
         tests/matrix_matrix_operations.cpp
-        tests/matrix_linear_solver.cpp
+        tests/matrix_linear_algebra.cpp
         tests/matrix_iterator_row_col_test.cpp
 )
 target_link_libraries(matrix_tests PRIVATE matrix_lib GTest::gtest_main)

@@ -15,6 +15,7 @@ TEST(MatrixConstruction, InitializesSizedMatrixWithZeros) {
 }
 
 TEST(MatrixConstruction, RejectsDimensionsWhoseProductOverflows) {
+    std::cout << "Constructing a matrix with SIZE_MAX columns and 2 rows must reject the overflowing element count with std::length_error.\n";
     EXPECT_THROW(
         (Matrix(std::numeric_limits<size_t>::max(), 2)),
         std::length_error
@@ -24,6 +25,7 @@ TEST(MatrixConstruction, RejectsDimensionsWhoseProductOverflows) {
 TEST(MatrixConstruction, ExposesRowAndColumnCounts) {
     const Matrix matrix(3, 2);
 
+    std::cout << "A Matrix constructed with 3 columns and 2 rows reports row_count() == 2 and column_count() == 3.\n";
     EXPECT_EQ(matrix.row_count(), 2u);
     EXPECT_EQ(matrix.column_count(), 3u);
 }

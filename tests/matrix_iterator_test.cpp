@@ -14,6 +14,7 @@ TEST(MatrixIterator, UpdatesMultiplesOfThreeThroughCoordinatesAndReference) {
         EXPECT_DOUBLE_EQ(value, matrix.at(x, y));
 
         if (static_cast<int>(value) % 3 == 0) {
+            std::cout << "Doubling value " << value << " at (" << x << ", " << y << ") to " << value * 2 << ".\n";
             value *= 2;
         }
     }

@@ -8,6 +8,7 @@
 // check gets a named entry in the gtest output instead of being invisible
 // file-scope code. A violation still fails the build rather than the test run.
 TEST(MatrixAccessElements, AtExposesConstCorrectElementReferences) {
+    std::cout << "Verifying at() returns a read-only reference for const matrices and a mutable reference for non-const matrices.\n";
     // A const Matrix only ever exposes read-only element access (const
     // double&), so its elements cannot be mutated through at().
     static_assert(std::is_same_v<decltype(std::declval<const Matrix&>().at(0, 0)), const double&>);

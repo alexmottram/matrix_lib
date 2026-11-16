@@ -11,7 +11,7 @@
 TEST(MatrixIterator, RowIteratorReturnsAllRowViews) {
     Matrix matrix{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
     const std::vector<double> expected_row_vec = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-    std::cout << "Starting row view tests..." << std::endl;
+    std::cout << "Iterating over all row views should flatten the matrix in row-major order:\n" << matrix << '\n';
     std::vector<double> flattened_row_vec {};
     for (auto [row_index, row_view] : matrix.rows()) {
         std::cout << "Row index: " << row_index << ", Row view: " << row_view << std::endl;
@@ -31,12 +31,15 @@ TEST(MatrixIterator, RowIteratorUpdatesEvensInRowIdx1) {
     Matrix matrix{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
     const Matrix expected_output_matrix{{1, 2, 3, 4}, {5, 12, 7, 16}, {9, 10, 11, 12}};
     const std::vector<double> expected_row_vec = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-    std::cout << "Starting row view tests..." << std::endl;
+    std::cout << "Doubling even values in row 1 (zero-based) should leave the other rows unchanged.\n"
+              << "Before:\n" << matrix << '\n';
     std::vector<double> flattened_row_vec {};
     for (auto [row_index, row_view] : matrix.rows()) {
         if (row_index == 1) {
             for (const auto val: row_view) {
                 if (std::fmod(val.value, 2.0) == 0.0) {
+                    std::cout << "Doubling even value " << val.value << " at (column " << val.x
+                              << ", row " << val.y << ") to " << val.value * 2 << ".\n";
                     val.value *= 2;
                 }
             }
@@ -50,6 +53,7 @@ TEST(MatrixIterator, RowIteratorUpdatesEvensInRowIdx1) {
 
 TEST(MatrixIterator, ConstRowIteratorReadsAllRowsWithoutModification) {
     const Matrix matrix{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
+    std::cout << "Reading all rows of a const matrix in row-major order without modifying its values:\n" << matrix << '\n';
     std::vector<double> flattened {};
     size_t rows = 0;
     for (auto [row_index, row_view] : matrix.rows()) {
@@ -66,6 +70,7 @@ TEST(MatrixIterator, ConstRowIteratorReadsAllRowsWithoutModification) {
 
 TEST(MatrixIterator, ColumnIteratorReturnsAllColumnViews) {
     Matrix matrix{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
+    std::cout << "Reading each column view top-to-bottom from this matrix:\n" << matrix << '\n';
     std::vector<double> flattened {};
     size_t columns = 0;
     for (auto [column_index, column_view] : matrix.columns()) {
@@ -82,20 +87,25 @@ TEST(MatrixIterator, ColumnIteratorReturnsAllColumnViews) {
 TEST(MatrixIterator, ColumnIteratorUpdatesEvensInColumnIdx1) {
     Matrix matrix{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
     const Matrix expected{{1, 4, 3, 4}, {5, 12, 7, 8}, {9, 20, 11, 12}};
+    std::cout << "Doubling only even values in column 1 (zero-based):\nBefore:\n" << matrix << '\n';
     for (auto [column_index, column_view] : matrix.columns()) {
         if (column_index == 1) {
             for (const auto val : column_view) {
                 if (std::fmod(val.value, 2.0) == 0.0) {
+                    std::cout << "Doubling even value " << val.value << " at (column " << val.x
+                              << ", row " << val.y << ") to " << val.value * 2 << ".\n";
                     val.value *= 2;
                 }
             }
         }
     }
+    std::cout << "After updating column 1:\n" << matrix << "\nExpected:\n" << expected << '\n';
     EXPECT_EQ(matrix, expected);
 }
 
 TEST(MatrixIterator, ConstColumnIteratorReadsAllColumnsWithoutModification) {
     const Matrix matrix{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
+    std::cout << "Reading every column of a const matrix top-to-bottom without modifying its values:\n" << matrix << '\n';
     std::vector<double> flattened {};
     size_t columns = 0;
     for (auto [column_index, column_view] : matrix.columns()) {
@@ -111,6 +121,7 @@ TEST(MatrixIterator, ConstColumnIteratorReadsAllColumnsWithoutModification) {
 }
 
 TEST(MatrixIterator, SliceIteratorsAreRandomAccess) {
+    std::cout << "Verifying row, column, and slice iterators satisfy the C++ random-access iterator and range concepts.\n";
     static_assert(std::random_access_iterator<Matrix::RowIterator>);
     static_assert(std::random_access_iterator<Matrix::ConstRowIterator>);
     static_assert(std::random_access_iterator<Matrix::ColumnIterator>);
@@ -127,6 +138,7 @@ TEST(MatrixIterator, SliceIteratorsAreRandomAccess) {
 
 TEST(MatrixIterator, SliceIteratorsSupportJumpsAndDistances) {
     Matrix matrix{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
+    std::cout << "Checking iterator offsets, indexed jumps, ordering, and distances across matrix rows, columns, and slices:\n" << matrix << '\n';
     auto rows = matrix.rows();
     EXPECT_EQ(rows.end() - rows.begin(), 3);
     EXPECT_EQ(rows.begin()[2].row_index, 2u);
@@ -149,6 +161,7 @@ TEST(MatrixIterator, SliceIteratorsSupportJumpsAndDistances) {
 
 TEST(MatrixIterator, ReverseViewOverRowsVisitsRowsBackwards) {
     const Matrix matrix{{1, 2}, {3, 4}, {5, 6}};
+    std::cout << "Reversing the row range should visit row indices 2, 1, 0 for this matrix:\n" << matrix << '\n';
     std::vector<size_t> order;
     for (auto [row_index, row_view] : std::views::reverse(matrix.rows())) {
         order.push_back(row_index);
