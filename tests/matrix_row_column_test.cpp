@@ -19,6 +19,11 @@ concept CanMatrixRowSwap = requires(Matrix& matrix) {
     matrix.swap_rows(0,1);
 };
 
+template <typename Matrix>
+concept CanMatrixColumnSwap = requires(Matrix& matrix) {
+    matrix.swap_columns(0,1);
+};
+
 // static_assert is a valid statement inside a TEST body, so these compile-time
 // checks get a named entry in the gtest output instead of being invisible
 // file-scope code. A violation still fails the build rather than the test run.
@@ -52,6 +57,12 @@ TEST(MatrixAccessRowColumn, RowSwapOnlyAvailableForMutableMatrix) {
     std::cout << "Verifying swap_rows is available on mutable matrices only and unavailable on const destinations.\n";
     static_assert(CanMatrixRowSwap<Matrix>);
     static_assert(!CanMatrixRowSwap<const Matrix>);
+}
+
+TEST(MatrixAccessRowColumn, ColumnSwapOnlyAvailableForMutableMatrix) {
+    std::cout << "Verifying swap_columns is available on mutable matrices only and unavailable on const destinations.\n";
+    static_assert(CanMatrixColumnSwap<Matrix>);
+    static_assert(!CanMatrixColumnSwap<const Matrix>);
 }
 
 TEST(MatrixAccessRowColumn, RowAtReadsElements) {
@@ -292,5 +303,35 @@ TEST(MatrixAccessRowColumn, RowSwapThrowsOnOutOfRangeIndexAndLeavesMatrixUnchang
     std::cout << "swap_rows(0, 2) and swap_rows(2, 0) on a 2-row matrix must throw std::out_of_range without modifying:\n" << matrix << '\n';
     EXPECT_THROW(matrix.swap_rows(0, 2), std::out_of_range);
     EXPECT_THROW(matrix.swap_rows(2, 0), std::out_of_range);
+    EXPECT_EQ(matrix, expected_matrix);
+}
+
+TEST(MatrixAccessRowColumn, ColumnSwapSwapsTwoColumnsCorrectly) {
+    Matrix matrix{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    const Matrix expected_matrix{{1, 3, 2}, {4, 6, 5}, {7, 9, 8}};
+
+    std::cout << "Swapping columns 1 and 2 in matrix:\n" << matrix << '\n';
+    matrix.swap_columns(1, 2);
+    std::cout << "Matrix after column swap:\n" << matrix << '\n';
+    EXPECT_EQ(matrix, expected_matrix);
+}
+
+TEST(MatrixAccessRowColumn, ColumnSwapWithSameColumnLeavesMatrixUnchanged) {
+    Matrix matrix{{1, 2, 3}, {4, 5, 6}};
+    const Matrix expected_matrix{{1, 2, 3}, {4, 5, 6}};
+
+    std::cout << "Swapping column 1 with itself should be a no-op. Matrix:\n" << matrix << '\n';
+    matrix.swap_columns(1, 1);
+    std::cout << "Matrix after swap_columns(1, 1):\n" << matrix << '\n';
+    EXPECT_EQ(matrix, expected_matrix);
+}
+
+TEST(MatrixAccessRowColumn, ColumnSwapThrowsOnOutOfRangeIndexAndLeavesMatrixUnchanged) {
+    Matrix matrix{{1, 2}, {3, 4}};
+    const Matrix expected_matrix{{1, 2}, {3, 4}};
+
+    std::cout << "swap_columns(0, 2) and swap_columns(2, 0) on a 2-column matrix must throw std::out_of_range without modifying:\n" << matrix << '\n';
+    EXPECT_THROW(matrix.swap_columns(0, 2), std::out_of_range);
+    EXPECT_THROW(matrix.swap_columns(2, 0), std::out_of_range);
     EXPECT_EQ(matrix, expected_matrix);
 }

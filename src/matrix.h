@@ -84,6 +84,8 @@ public:
     // available for non-const Matrices
     void swap_rows(size_t row1, size_t row2);
     void swap_rows(size_t row1, size_t row2) const = delete;
+    void swap_columns(size_t column1, size_t column2);
+    void swap_columns(size_t column1, size_t column2) const = delete;
 
     // Output
     friend std::ostream& operator<<(std::ostream& os, const Matrix& a);

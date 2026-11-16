@@ -134,6 +134,21 @@ void Matrix::swap_rows(const size_t row1, const size_t row2) {
     }
 }
 
+void Matrix::swap_columns(const size_t column1, const size_t column2) {
+    if (column1 >= size_x) {
+        throw std::out_of_range("Matrix column index column 1 out of range");
+    }
+    if (column2 >= size_x) {
+        throw std::out_of_range("Matrix column index column 2 out of range");
+    }
+    if (column1 == column2) {
+        return;
+    }
+    for (size_t y = 0; y < size_y; ++y) {
+        std::swap(at(column1, y), at(column2, y));
+    }
+}
+
 bool Matrix::operator==(const Matrix &matrix) const {
     if (size_x != matrix.size_x || size_y != matrix.size_y) {
         return false;
