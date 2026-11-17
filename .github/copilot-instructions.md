@@ -47,6 +47,9 @@ Current layout (the pricing layer will be added as `src/pricing/` with tests in 
 - `tests/matrix/` – GoogleTest files for the matrix library, one per feature area; register new test files in `CMakeLists.txt`.
 - `examples/main.cpp` – example executable (`matrix_example`).
 - `CMakeLists.txt` – builds the `matrix_lib` library, `matrix_example`, and `matrix_tests` (CTest-discovered).
+- `.github/agents/test-writer.agent.md` – custom agent that writes and runs tests, never touching implementation code.
+- `.github/prompts/` – reusable prompts (`/add-tests`, `/review-mathematical`).
+- `.githooks/pre-push` – builds and runs all tests before a push (enable with `git config core.hooksPath .githooks`).
 
 ## Design and implementation
 

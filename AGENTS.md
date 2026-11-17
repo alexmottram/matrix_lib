@@ -14,6 +14,8 @@ When reviewing, explain concepts and trade-offs and suggest fitting modern C++ f
 - `mathematical.instructions.md` – applies to `src/matrix/matrix.h`, `src/matrix/matrix.cpp`, `tests/matrix/matrix_linear_algebra.cpp`, `src/pricing/**`, `tests/pricing/**`
 - `tests.instructions.md` – applies to `tests/**`
 
+Reusable workflows: the `test-writer` agent (`.github/agents/test-writer.agent.md`) writes and runs tests without touching implementation code; prompts in `.github/prompts/` (`/add-tests`, `/review-mathematical`). A `pre-push` hook in `.githooks/` runs the full build and tests (enable with `git config core.hooksPath .githooks`).
+
 Read these before making changes. The project map (which file holds what) is in `.github/copilot-instructions.md`.
 
 ## Hard rules
