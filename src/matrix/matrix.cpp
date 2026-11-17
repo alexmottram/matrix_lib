@@ -265,7 +265,7 @@ Matrix Matrix::transpose() const {
 
 bool Matrix::is_square() const
 {
-    return size_x != size_y;
+    return size_x == size_y;
 }
 
 size_t Matrix::coord_to_index(const size_t x, const size_t y) const {
