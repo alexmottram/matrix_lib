@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../src/matrix_lib.h"
+#include "matrix/matrix_lib.h"
 
 template <typename DestinationMatrix, typename SourceMatrix>
 concept CanReplaceMatrixRow = requires(DestinationMatrix& destination, SourceMatrix& source) {

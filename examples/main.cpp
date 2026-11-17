@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "../src/matrix_lib.h"
+#include "matrix/matrix_lib.h"
 
 int main() {
     Matrix a(3, 2);

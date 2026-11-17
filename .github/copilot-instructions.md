@@ -1,34 +1,68 @@
 # Copilot instructions
 
+## Mathematical functionality (hard rule)
+
+The user writes the mathematical functionality themselves (e.g. `lin_solve()`, `is_row_echelon_form()`, `augmented_matrix()`, and all pricing and numerical logic) and uses Copilot as a tester and reviewer. Do not provide logical implementations of it, or of non-mathematical code in that area (accessors, row swapping, creators). Feedback, tests, and code for repetitive tasks mirroring existing user code are welcome. Full rules: `.github/instructions/mathematical.instructions.md`.
+
 ## Project goals
 
-- This is a lightweight C++ matrix library intended to be easy to embed in other codebases, including mathematical-puzzle projects.
-- Prefer a small, focused core and standard-library facilities. Keep the core free of third-party runtime dependencies; test-only dependencies are acceptable.
+This is a learning project. The goals, in order:
+
+1. Improve knowledge of financial derivatives pricing.
+2. Improve knowledge of linear algebra.
+3. Improve C++ skills: learn new language features and best practices.
+
+The project has two layers:
+
+- `matrix_lib`: a lightweight `double`-only matrix library with no third-party runtime dependencies (test-only dependencies are acceptable). It stays `double`-only; do not introduce templates or broaden element types without a concrete requirement.
+- `pricing_lib` (planned): derivatives pricing built on `matrix_lib`. Dependencies go one way only: pricing depends on matrix, never the reverse.
+
+Roadmap (work in order; each stage pairs finance, linear algebra, and C++ goals):
+
+1. Matrix foundations: solving, echelon form, rank, determinant, inverse.
+2. Decompositions: LU, Cholesky, QR, eigenvalues.
+3. Rates and discounting: curves, interpolation (splines), bond pricing.
+4. Closed-form options: Black-Scholes, Greeks, implied volatility.
+5. Lattices and PDEs: binomial trees, finite differences.
+6. Monte Carlo: correlated paths, variance reduction, PCA.
+7. Risk and portfolios: covariance, optimisation, VaR, least squares.
+8. Stretch: American options (regression), SVD, performance work.
+
+How to help with learning:
+
+- Explain concepts, trade-offs, and relevant financial or mathematical context when reviewing code, rather than just giving answers.
+- When reviewing, suggest modern C++ features or best practices that would fit (e.g. "`std::span` would fit here") as guidance only, without writing the implementation for mathematical code.
 - Prioritize mathematical correctness and clear behavior. When performance choices are non-obvious, explain the trade-offs rather than optimizing speculatively.
-- The current `Matrix` stores `double` values. Keep changes consistent with the existing API; do not introduce templates or broaden supported element types without a concrete requirement.
+
+## Project map
+
+Current layout (the pricing layer will be added as `src/pricing/` with tests in `tests/pricing/`, its own `pricing_lib` and `pricing_tests` targets, and a one-way dependency on `matrix_lib`; update this map when it is created). Include root is `src/`, so headers are included as `"matrix/..."` and `"utils/..."`:
+
+- `src/matrix/matrix.h`, `src/matrix/matrix.cpp` – the `Matrix` class (storage, access, arithmetic, and the mathematical functionality).
+- `src/matrix/matrix_iterator.*` – `Matrix::Iterator` / `ConstIterator` over elements.
+- `src/matrix/matrix_slice_iterators.h`, `src/matrix/matrix_slice_views.*` – row/column iterators, ranges, and views.
+- `src/matrix/matrix_lib.h` – convenience header including the full matrix API (include as `"matrix/matrix_lib.h"`; the include root is `src/`).
+- `src/utils/external_deps.h` – single place for standard-library includes used by the library; add new std includes here rather than in individual files.
+- `src/utils/std_extensions.h` – helper stream operators for std types.
+- `tests/matrix/` – GoogleTest files for the matrix library, one per feature area; register new test files in `CMakeLists.txt`.
+- `examples/main.cpp` – example executable (`matrix_example`).
+- `CMakeLists.txt` – builds the `matrix_lib` library, `matrix_example`, and `matrix_tests` (CTest-discovered).
 
 ## Design and implementation
 
 - Use C++23 and follow the existing CMake project structure and C++ conventions.
 - Preserve a clear separation between the core matrix functionality and presentation. Keep `std::ostream` formatting independent of GUI frameworks; any future GUI integration should be optional and outside the core.
 - The public API is still evolving, so breaking changes are acceptable when they materially improve the design. Keep related declarations, implementations, examples, and tests consistent, and call out meaningful API changes.
-- Validate dimensions, indices, and operation preconditions. Use exceptions for invalid or undefined operations, following existing exception types and behavior.
+- Validate dimensions, indices, and operation preconditions, and throw for invalid or undefined operations using the existing exception types:
+  - `std::out_of_range` for row, column, or coordinate indices outside the matrix.
+  - `std::invalid_argument` for mismatched dimensions or sizes (e.g. addition, subtraction, multiplication, ragged rows, row/column view size mismatch).
+  - `std::length_error` when requested dimensions exceed the maximum element count.
 - Avoid unrelated refactoring and generated files. Do not edit files under `cmake-build-*`.
-
-## Linear algebra implementation guidance
-
-- Do not implement, propose implementation approaches, or volunteer fixes for functions in the linear algebra area (including `lin_solve()`, `is_row_echelon_form()`, and `augmented_matrix()`) unless the user specifically asks for implementation suggestions or changes. The user wants to develop these implementations independently and use Copilot to test, review, and improve code they provide.
-- When asked to test, review, or provide feedback on a user-authored linear algebra implementation, stay within that scope: identify behavior with tests or concrete evidence and discuss the implementation provided, but do not write replacement algorithms or unsolicited implementation plans.
 
 ## Tests and validation
 
-- Add focused GoogleTest coverage for behavior changes, including relevant invalid-input and boundary cases.
-- Every GoogleTest `TEST`/`TEST_F` body must write a clear `std::cout` explanation of the behavior being tested. Put the explanation before assertions so it remains useful when a test fails, and include relevant inputs, expected behavior, and before/after values when these help explain the example.
-- Keep test output instructional and specific to the test rather than using generic progress messages. Compile-time checks inside test bodies must also print what property they verify.
-- Include `<iostream>` in test files that use `std::cout`; prefer `\n` over `std::endl` unless flushing is needed. Preserve useful matrix/value output alongside the explanation where it clarifies the operation.
-- In tests that modify values inside loops, print a concise message for each value that actually changes, including its coordinates or iteration index and its old and new values. Do not print every unchanged value; keep loop output bounded and informative.
-- Use `ctest --verbose` when reviewing successful test output; CTest otherwise hides `std::cout` from passing tests.
-- Run the relevant tests with CTest after changes. A typical local workflow is:
+- Add focused GoogleTest coverage for behavior changes, including relevant invalid-input and boundary cases. Detailed test conventions (including the mandatory `std::cout` explanations) are in `.github/instructions/tests.instructions.md`.
+- Run the relevant tests with CTest after changes, using `--verbose` to see test output. A typical local workflow is:
 
   ```sh
   cmake -S . -B build
@@ -37,3 +71,10 @@
   ```
 
 - The GitHub Actions workflow builds and tests on Ubuntu and Windows. Keep changes portable across both platforms.
+
+## Definition of done
+
+- The project builds without new warnings and `ctest --test-dir build --verbose` passes.
+- New or changed behavior has tests that follow `.github/instructions/tests.instructions.md`.
+- Related declarations, implementations, examples (`examples/main.cpp`), and `CMakeLists.txt` registrations are consistent.
+- Meaningful API changes are called out in the summary.

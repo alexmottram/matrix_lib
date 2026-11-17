@@ -3,7 +3,7 @@
 #include <iostream>
 #include <limits>
 
-#include "../src/matrix_lib.h"
+#include "matrix/matrix_lib.h"
 
 TEST(MatrixConstruction, InitializesSizedMatrixWithZeros) {
     const Matrix matrix(3, 2);

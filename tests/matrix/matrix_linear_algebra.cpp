@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../src/matrix_lib.h"
+#include "matrix/matrix_lib.h"
 
 TEST(MatrixLinSolve, SolvesSimpleLinearSystem) {
     const Matrix A{{1, 2, 1}, {3, 8, 1}, {0, 4, 1}};
