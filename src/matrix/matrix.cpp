@@ -263,6 +263,11 @@ Matrix Matrix::transpose() const {
     return result;
 }
 
+bool Matrix::is_square() const
+{
+    return size_x != size_y;
+}
+
 size_t Matrix::coord_to_index(const size_t x, const size_t y) const {
     if (x >= size_x || y >= size_y) {
         throw std::out_of_range("Matrix coordinates out of range");

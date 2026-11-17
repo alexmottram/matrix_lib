@@ -37,6 +37,7 @@ add_executable(matrix_tests
         tests/matrix/matrix_row_column_test.cpp
         tests/matrix/matrix_basic_arithmetic_operations.cpp
         tests/matrix/matrix_matrix_operations.cpp
+        tests/matrix/matrix_properties.cpp
         tests/matrix/matrix_iterator_row_col_test.cpp
 )
 target_link_libraries(matrix_tests PRIVATE matrix_lib GTest::gtest_main)

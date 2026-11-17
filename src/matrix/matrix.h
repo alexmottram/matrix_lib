@@ -143,6 +143,9 @@ public:
     // Matrix operations
     [[nodiscard]] Matrix transpose() const;
 
+    // Matrix properties
+    bool is_square() const;
+
     // Linear algebra operations
     // [[nodiscard]] Matrix lin_solve(const Matrix & b) const;
     // [[nodiscard]] bool is_row_echelon_form() const;
