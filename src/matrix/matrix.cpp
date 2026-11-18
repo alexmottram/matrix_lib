@@ -17,7 +17,7 @@ Matrix::Matrix(const size_t size_x, const size_t size_y)
 
 Matrix::Matrix(const std::initializer_list<std::initializer_list<double>> values)
     : size_y(values.size()) {
-    if (values.size() != 0) {
+    if (!values.empty()) {
         size_x = values.begin()->size();
     }
 
@@ -154,13 +154,7 @@ bool Matrix::operator==(const Matrix &matrix) const {
         return false;
     }
 
-    for (const auto [x, y, value] : *this) {
-        if (value != matrix.at(x, y)) {
-            return false;
-        }
-    }
-
-    return true;
+    return this->data == matrix.data;
 }
 
 Matrix::Iterator Matrix::begin() {
