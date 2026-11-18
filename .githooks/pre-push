@@ -2,6 +2,15 @@
 # Build and run all tests before pushing. Enable with:
 #   git config core.hooksPath .githooks
 set -e
+
+# Fail if any file is neither tracked nor ignored (via .gitignore, .git/info/exclude or global ignore).
+untracked=$(git ls-files --others --exclude-standard)
+if [ -n "$untracked" ]; then
+    echo "Push aborted: untracked files must be added (git add) or ignored:" >&2
+    echo "$untracked" >&2
+    exit 1
+fi
+
 cmake -S . -B build
 cmake --build build
 ctest --test-dir build -C Debug --output-on-failure
