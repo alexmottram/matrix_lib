@@ -31,8 +31,8 @@ Roadmap (work in order; each stage pairs finance, linear algebra, and C++ goals)
 How to help with learning:
 
 - Explain concepts, trade-offs, and relevant financial or mathematical context when reviewing code, rather than just giving answers.
-- When reviewing, suggest modern C++ features or best practices that would fit (e.g. "`std::span` would fit here") as guidance only, without writing the implementation for mathematical code.
-- Prioritize mathematical correctness and clear behavior. When performance choices are non-obvious, explain the trade-offs rather than optimizing speculatively.
+- Suggest fitting modern C++ features or best practices (e.g. "`std::span` would fit here") as guidance only; never write mathematical implementations.
+- Prioritize mathematical correctness and clear behavior. Explain non-obvious performance trade-offs rather than optimizing speculatively.
 
 ## Project map
 
@@ -47,8 +47,8 @@ Current layout (the pricing layer will be added as `src/pricing/` with tests in 
 - `tests/matrix/` – GoogleTest files for the matrix library, one per feature area; register new test files in `CMakeLists.txt`.
 - `examples/main.cpp` – example executable (`matrix_example`).
 - `CMakeLists.txt` – builds the `matrix_lib` library, `matrix_example`, and `matrix_tests` (CTest-discovered).
-- `.github/agents/test-writer.agent.md` – custom agent that writes and runs tests, never touching implementation code.
-- `.github/prompts/` – reusable prompts (`/add-tests`, `/review-mathematical`).
+- `.github/agents/` – `test-writer` (writes and runs tests, never edits `src/`), plus read-only `code-reviewer` (C++ quality) and `math-reviewer` (mathematical correctness). Reviewers list missing tests but write none.
+- `.github/prompts/` – reusable prompts (`/add-tests`).
 - `.githooks/pre-push` – builds and runs all tests before a push (enable with `git config core.hooksPath .githooks`).
 
 ## Design and implementation
@@ -65,19 +65,19 @@ Current layout (the pricing layer will be added as `src/pricing/` with tests in 
 ## Tests and validation
 
 - Add focused GoogleTest coverage for behavior changes, including relevant invalid-input and boundary cases. Detailed test conventions (including the mandatory `std::cout` explanations) are in `.github/instructions/tests.instructions.md`.
-- Run the relevant tests with CTest after changes, using `--verbose` to see test output. A typical local workflow is:
+- Run the relevant tests with CTest after changes. `--verbose` shows test output. Use this workflow, which works for single-config (Ninja, Make) and multi-config (Visual Studio, Xcode) generators:
 
   ```sh
-  cmake -S . -B build
-  cmake --build build
-  ctest --test-dir build --verbose
+  cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+  cmake --build build --config Debug
+  ctest --test-dir build -C Debug --verbose
   ```
 
 - The GitHub Actions workflow builds and tests on Ubuntu and Windows. Keep changes portable across both platforms.
 
 ## Definition of done
 
-- The project builds without new warnings and `ctest --test-dir build --verbose` passes.
+- The project builds without new warnings and `ctest --test-dir build -C Debug --verbose` passes.
 - New or changed behavior has tests that follow `.github/instructions/tests.instructions.md`.
 - Related declarations, implementations, examples (`examples/main.cpp`), and `CMakeLists.txt` registrations are consistent.
 - Meaningful API changes are called out in the summary.

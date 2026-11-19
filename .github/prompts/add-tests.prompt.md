@@ -8,4 +8,4 @@ Add GoogleTest tests for the behavior I describe (or for the code I point to).
 - Cover normal behavior, invalid inputs (expect the existing exception types), and boundary cases (empty, 1x1, non-square, first/last index).
 - Put tests in the matching existing file under `tests/matrix/` (or `tests/pricing/` for pricing code), or create a new file and register it in `CMakeLists.txt` under the relevant tests target.
 - Do not change the implementation under test.
-- Run `cmake --build build` and `ctest --test-dir build --verbose`, and report the results.
+- Run `cmake --build build --config Debug` and `ctest --test-dir build -C Debug --verbose`, and report the results.
