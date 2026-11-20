@@ -13,6 +13,7 @@
 #include <list>
 #include <numeric>
 #include <ostream>
+#include <ranges>
 #include <sstream>
 #include <stdexcept>
 #include <type_traits>

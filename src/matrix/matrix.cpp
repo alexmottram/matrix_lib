@@ -272,24 +272,30 @@ Matrix Matrix::transpose() const {
     return result;
 }
 
-Matrix Matrix::col_augmented_matrix(const Matrix& matrix) const
+Matrix Matrix::augment_columns(const Matrix& matrix) const
 {
     if (this->size_y != matrix.size_y)
     {
-        throw std::invalid_argument("Matrix columns must match to create column augmented matrix");
+        throw std::invalid_argument("Matrices must have the same number of rows to augment columns");
     }
 
-    std::vector<std::vector<double>> aug_data;
-
-    for (auto y {0}; y < size_y; ++y)
+    Matrix augmented_matrix {this->size_x + matrix.size_x, this->size_y};
+    auto aug_it = augmented_matrix.data.begin();
+    for (size_t y {0}; y < size_y; ++y)
     {
-        auto aug_row {this->row_at(y).to_vector()};
-        aug_row.append_range(matrix.row_at(y).to_vector());
-        aug_data.emplace_back(aug_row);
+        const auto l_out = std::ranges::copy(
+            this->row_at(y) | std::views::transform([](const auto& element) { return element.value; }),
+                aug_it
+        ).out;
+        aug_it = l_out;
+        const auto r_out = std::ranges::copy(
+             matrix.row_at(y) | std::views::transform([](const auto& element) { return element.value; }),
+                 aug_it
+         ).out;
+        aug_it = r_out;
     }
 
-    return Matrix {aug_data};
-
+    return augmented_matrix;
 }
 
 bool Matrix::is_square() const

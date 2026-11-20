@@ -143,7 +143,7 @@ public:
 
     // Matrix operations
     [[nodiscard]] Matrix transpose() const;
-    [[nodiscard]] Matrix col_augmented_matrix(const Matrix & matrix) const;
+    [[nodiscard]] Matrix augment_columns(const Matrix & matrix) const;
 
     // Matrix properties
     [[nodiscard]] bool is_square() const;
