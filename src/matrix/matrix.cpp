@@ -15,6 +15,21 @@ Matrix::Matrix(const size_t size_x, const size_t size_y)
     : data(checked_element_count(size_x, size_y), 0.0), size_x(size_x), size_y(size_y) {
 }
 
+Matrix::Matrix(const std::vector<std::vector<double>>& values): size_y(values.size()){
+    if (!values.empty())
+    {
+        size_x = values.begin()->size();
+    }
+
+    for (const auto& row : values) {
+        if (row.size() != size_x) {
+            throw std::invalid_argument("matrix rows must all have the same length");
+        }
+
+        data.insert(data.end(), row.begin(), row.end());
+    }
+}
+
 Matrix::Matrix(const std::initializer_list<std::initializer_list<double>> values)
     : size_y(values.size()) {
     if (!values.empty()) {
@@ -255,6 +270,26 @@ Matrix Matrix::transpose() const {
     }
 
     return result;
+}
+
+Matrix Matrix::col_augmented_matrix(const Matrix& matrix) const
+{
+    if (this->size_y != matrix.size_y)
+    {
+        throw std::invalid_argument("Matrix columns must match to create column augmented matrix");
+    }
+
+    std::vector<std::vector<double>> aug_data;
+
+    for (auto y {0}; y < size_y; ++y)
+    {
+        auto aug_row {this->row_at(y).to_vector()};
+        aug_row.append_range(matrix.row_at(y).to_vector());
+        aug_data.emplace_back(aug_row);
+    }
+
+    return Matrix {aug_data};
+
 }
 
 bool Matrix::is_square() const

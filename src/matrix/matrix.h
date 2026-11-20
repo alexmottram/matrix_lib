@@ -54,8 +54,9 @@ public:
     using ConstColumnView = ColumnViewBase<true>;
 
     // Constructors
-    explicit Matrix(size_t size_x, size_t size_y);
     Matrix(std::initializer_list<std::initializer_list<double>> values);
+    explicit Matrix(size_t size_x, size_t size_y);
+    explicit Matrix(const std::vector<std::vector<double>>& values);
 
     // Named factories for single-row / single-column matrices. Named rather
     // than overloaded constructors because two std::initializer_list<double>
@@ -142,9 +143,10 @@ public:
 
     // Matrix operations
     [[nodiscard]] Matrix transpose() const;
+    [[nodiscard]] Matrix col_augmented_matrix(const Matrix & matrix) const;
 
     // Matrix properties
-    bool is_square() const;
+    [[nodiscard]] bool is_square() const;
 
     // Linear algebra operations
     // [[nodiscard]] Matrix lin_solve(const Matrix & b) const;
