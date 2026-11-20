@@ -2,7 +2,7 @@
 
 Learning project with three goals: (1) financial derivatives pricing, (2) linear algebra, (3) better C++ (new features, best practices).
 
-It has two layers: `matrix_lib`, a lightweight C++23 matrix library (`double` elements only, no third-party runtime dependencies, GoogleTest is test-only), and a planned `pricing_lib` built on it (one-way dependency: pricing depends on matrix). The roadmap is in `.github/copilot-instructions.md`.
+It has two layers: `matrix_lib`, a lightweight C++23 matrix library (`double` elements only, no third-party runtime dependencies, GoogleTest is test-only), and a planned `pricing_lib` built on it (one-way dependency: pricing depends on matrix). The roadmap stages are in `.github/copilot-instructions.md`, and the tickable progress checklist (what is done, what is next) is in `.github/roadmap.md`: read it before suggesting next steps and never suggest ticked items.
 
 When reviewing, explain concepts and trade-offs and suggest fitting modern C++ features as guidance, without writing the implementation of mathematical code.
 

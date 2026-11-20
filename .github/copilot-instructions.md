@@ -28,6 +28,8 @@ Roadmap (work in order; each stage pairs finance, linear algebra, and C++ goals)
 7. Risk and portfolios: covariance, optimisation, VaR, least squares.
 8. Stretch: American options (regression), SVD, performance work.
 
+Progress is tracked item by item in `.github/roadmap.md`. Read it before suggesting what to work on next, never suggest items already ticked, and update it when an item is completed.
+
 How to help with learning:
 
 - Explain concepts, trade-offs, and relevant financial or mathematical context when reviewing code, rather than just giving answers.
@@ -48,6 +50,7 @@ Current layout (the pricing layer will be added as `src/pricing/` with tests in 
 - `examples/main.cpp` – example executable (`matrix_example`).
 - `CMakeLists.txt` – builds the `matrix_lib` library, `matrix_example`, and `matrix_tests` (CTest-discovered).
 - `.github/agents/` – `test-writer` (writes and runs tests, never edits `src/`), plus read-only `code-reviewer` (C++ quality) and `math-reviewer` (mathematical correctness). Reviewers list missing tests but write none.
+- `.github/roadmap.md` – tickable checklist of done and pending roadmap items; the source of truth for "what next".
 - `.github/prompts/` – reusable prompts (`/add-tests`).
 - `.githooks/pre-push` – builds and runs all tests before a push (enable with `git config core.hooksPath .githooks`).
 
